@@ -2,11 +2,11 @@
 
 ## Objective
 
-For Assignment 1 (A1) we are going to be building a component libary that we can use for future assignments. Our goal main goal is to layout the building blocks components that will be composed together to create our final bigger components. We will focus on compisition, component interfaces, and styling. We aren't going to focus on functionality quiet yet and at first our components will be very static.
+For Assignment 1 (A1) we are going to be building a component libary that we can use for future assignments. Our main goal is to layout the components that will be composed together to create our final bigger components. We will focus on composition, component interfaces, and styling. We aren't going to focus on functionality quite yet and at first our components will be very static.
 
 ## What are we building?
 
-In the fitness world, there are lots of different ways a workout can be timed. For example, we can use a traditional stopwatch, a count-down timer, an interval timer, etc. To support our athletes, we’ll be building 4 differet types of timers:
+In the fitness world, there are lots of different ways a workout can be timed. For example, we can use a traditional stopwatch, a count-down timer, an interval timer, etc. To support our athletes, we’ll be building 4 different types of timers:
 <br/>
 <br/>
 | Timer type | Description |
@@ -18,14 +18,14 @@ In the fitness world, there are lots of different ways a workout can be timed. F
 
 <br/>
 
-Here we are thinking about mainly UI/UX. What is information is most important to my end user? How does that change as the workout progress? How is my UI going to improve their workout? etc ...
+Here we are thinking about mainly UI/UX. What information is most important to my end user? How does that change as the workout progress? How is my UI going to improve their workout? etc ...
 
-Our larger components are going to be `Stopwatch`, `Countdown`, `XY`, and `TABATA`, but you can imagine that we have common functionality. An example is a start button. All timers are going to have to have a way to start. Our goal is to take these large components and extract common functionality into smaller components. We might have a `Button` component that is shared by all of our timers and it might have a prop that we pass in that changes the background color in order to create a start `Button` and a stop `Button`.
+Our larger components are going to be `Stopwatch`, `Countdown`, `XY`, and `TABATA`, but you can imagine that they have common functionality. An example is a start button. All timers are going to have to have a way to start. Our goal is to take these large components and extract common functionality into smaller components. We might have a `Button` component that is shared by all of our timers and it might have a prop that we pass in that changes the background color in order to create a start `Button` and a stop `Button`.
 
 ## Deliverable
 
 1. Create generic components that are going to be used by your timers. The most basic ones, but not limited to, are going to be a `Button`, `Input`, `DisplayTime`, `DisplayRounds`, and `Panel` (that handles layout of your timer).
-2. Assemble your timers using these generic. They should render below your documentation.
+2. Assemble your timers using these generic components. They should render below your documentation.
 
 ```
 
