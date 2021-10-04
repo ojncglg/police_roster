@@ -2,7 +2,7 @@
 
 ## Objective
 
-For Assignment 1 (A1) we are going to be building a component libary that we can use for future assignments. Our goal main goal is to layout the building blocks components that will be composed together to create our final bigger components. We will focus on compisition, component interfaces, and styling. We are going to use our lectures on React components, props, and styling, in order to build this library. We aren't going to focus on functionality quiet yet and at first our components will be very static.
+For Assignment 1 (A1) we are going to be building a component libary that we can use for future assignments. Our goal main goal is to layout the building blocks components that will be composed together to create our final bigger components. We will focus on compisition, component interfaces, and styling. We aren't going to focus on functionality quiet yet and at first our components will be very static.
 
 ## What are we building?
 
