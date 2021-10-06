@@ -22,6 +22,7 @@ class Documentation extends React.Component {
         <div>
           <Title>Documentation</Title>
           <DocumentComponent
+            title="Loading spinner "
             component={<Loading />}
             propDocs={[
               {
