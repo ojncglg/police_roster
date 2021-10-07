@@ -23,7 +23,7 @@ Our larger components are going to be `Stopwatch`, `Countdown`, `XY`, and `TABAT
 
 1. Create generic components that are going to be used by your timers. The most basic ones, but not limited to, are going to be a `Button`, `Input`, `DisplayTime`, `DisplayRounds`, and `Panel` (that handles layout of your timer).
 2. Assemble your timers using the generic component library you have created. All timers should render at `localhost:3000`.
-3. Style your components in a way that they are consistent and look presentable. Do not use an existing UI design language (e.g. Google's Material UI), instead try to come up with your own. **You are welcome to search the internet for design inspiration, but make sure to cite all resources you have used.**
+3. Style your components in a way that they are consistent and look presentable. Do not use an existing UI design library (e.g. Google's Material UI or Antd), instead try to come up with your own. **You are welcome to search the internet for design inspiration, but make sure to cite all resources you have used.**
 4. Document all of the generic components you have created. In order to do this navigate to `src/view/Documentation` and add your components 1 by 1 with documentation of all props. We have provided an example loading spinner that you can follow.
 5. Deploy your application using any method you like (we will provide instructions for GH actions): **URL_TO_APP**
 
