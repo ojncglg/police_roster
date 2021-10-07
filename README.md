@@ -44,7 +44,7 @@ For other ways to deploy see https://github.com/prof-tejera/react-deployment-cod
 
 - All components are styled using the same method, with the exception of the components we created (e.g. views, App). We have used `styled-components`, but you don't have to.
 - UI is consistent and effort has been put into making it look nice. Cite any resources you used.
-- All generic components that you have created have been added `docs` and the PropType interfaces have been defined in each of componet files.
+- All generic components that you have created have been added `docs` and the PropType interfaces have been defined in each of component files.
 - Assemble all timers and render them. They for the most part should be static and not functional.
 
 ## Install and Run Project
