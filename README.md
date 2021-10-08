@@ -45,6 +45,7 @@ For other ways to deploy see https://github.com/prof-tejera/react-deployment-cod
 - All generic components that you have created have been added `docs` and the PropType interfaces have been defined in each of component files.
 - Assemble all timers and render them. They for the most part should be static and not functional.
 - Keep your code as DRY (Don't repeat yourself) as possible
+- The console should be free of errors and  warnings
 
 ## Install and Run Project
 
