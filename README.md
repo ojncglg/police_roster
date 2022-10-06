@@ -30,9 +30,8 @@ Our larger components are going to be `Stopwatch`, `Countdown`, `XY`, and `Tabat
 
 ## Grading rubric
 
-- All timers are functioning correctly
+- All 4 timers are working correctly. Timers should have pause/resume button, a reset button, and a button that ends the timer.
 - UI is consistent and effort has been put into making it look nice. Cite any resources you used.
-- Assemble all timers and render them. They for the most part should be static and not functional.
 - Keep your code as DRY (Don't repeat yourself) as possible
 - Define PropTypes for all components
 - The console should be free of errors and warnings
