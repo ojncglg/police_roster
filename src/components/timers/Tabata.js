@@ -1,9 +1,3 @@
-import React from "react";
-
-class Tabata extends React.Component {
-  render() {
-    return null;
-  }
-}
+const Tabata = () => null;
 
 export default Tabata;

@@ -2,7 +2,7 @@
 
 ## Objective
 
-For Assignment 1 (A1) we are going to be building a component libary that we can use for future assignments. Our main goal is to layout the components that will be composed together to create our final bigger components. We will focus on composition, component interfaces, and styling. We aren't going to focus on functionality quite yet and at first our components will be very static.
+For Assignment 1 (A1) we are going to be building four different timer components that we will be used in future assignments.
 
 ## What are we building?
 
@@ -19,33 +19,27 @@ Our larger components are going to be `Stopwatch`, `Countdown`, `XY`, and `TABAT
 
 ## Deliverable
 
-1. Create generic components that are going to be used by your timers. The most basic ones, but not limited to, are going to be a `Button`, `Input`, `DisplayTime`, `DisplayRounds`, and `Panel` (that handles layout of your timer).
-2. Assemble your timers using the generic component library you have created. All timers should render at `localhost:3000`.
-3. Style your components in a way that they are consistent and look presentable. Do not use an existing UI design library (e.g. Google's Material UI or Antd), instead try to come up with your own. **You are welcome to search the internet for design inspiration, but make sure to cite all resources you have used.**
-4. Document all of the generic components you have created. In order to do this navigate to `src/view/Documentation` and add your components 1 by 1 with documentation of all props. We have provided an example loading spinner that you can follow.
-5. Deploy your application using any method you like (we will provide instructions for GH actions): **URL_TO_APP**
+1. Get all 4 types of timers to work. The timers should have a Pause/Resume button, a reset button, and a "fast forward" button (ends the timer). All timers should render at `localhost:3000`. You should try to DRY up your code by creating generic components that are going to be used by your timers. The most basic ones, but not limited to, are going to be a `Button`, `Input`, `DisplayTime`, `DisplayRounds`, and `Panel` (that handles layout of your timer).
+2. Style your components in a way that they are consistent and look presentable. Do not use an existing UI design library (e.g. MUI or Antd), instead try to come up with your own. **You are welcome to search the internet for design inspiration, but make sure to cite all resources you have used.**
+3. Document all of the generic components you have created. In order to do this navigate to `src/view/Documentation` and add your components 1 by 1 with documentation of all props. We have provided an example loading spinner that you can follow.
+4. Deploy your application using any method you like (we will provide instructions for GH actions): **URL_TO_APP**
 
-### Deployment Instructions (GH actions)
+### Deployment Instructions (Github actions)
 
-- Go to `Settings`
-- Go to `Pages`
-- in `Source`, select `gh-pages` branch
-- Click Save
-- In `package.json`, add a new key/value as: `"homepage": "https://prof-tejera.github.io/<YOUR REPO NAME GOES HERE>"`
-
-Once the `build-deploy` action finishes running, the app should be live
-at `https://prof-tejera.github.io/<YOUR REPO NAME GOES HERE>`
-
-For other ways to deploy see https://github.com/prof-tejera/react-deployment-code
+[Deployment instructions](https://github.com/prof-tejera/react-deployment-code#github-actions)
 
 ## Grading rubric
 
-- All components are styled using the same method, with the exception of the components we created (e.g. views, App). We have used `styled-components`, but you don't have to.
+- All timers are functioning correctly
 - UI is consistent and effort has been put into making it look nice. Cite any resources you used.
-- All generic components that you have created have been added `docs` and the PropType interfaces have been defined in each of component files.
 - Assemble all timers and render them. They for the most part should be static and not functional.
 - Keep your code as DRY (Don't repeat yourself) as possible
-- The console should be free of errors and  warnings
+- Define PropTypes for all components
+- The console should be free of errors and warnings
+
+## Bonus (5pt)
+
+- Add documentation for your components. A template for this documentation can be found at `/docs`.
 
 ## Install and Run Project
 
@@ -61,4 +55,4 @@ Run project
 npm start
 ```
 
-Assembled timers: `localhost:3000`. Documentation: `localhost:3000/docs`
+Timers: `localhost:3000`. Documentation: `localhost:3000/docs`

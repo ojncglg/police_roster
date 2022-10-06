@@ -11,7 +11,7 @@ const Container = styled.div`
   overflow: auto;
 `;
 
-function App() {
+const App = () => {
   return (
     <Container>
       <Router>
@@ -36,6 +36,6 @@ function App() {
       </Router>
     </Container>
   );
-}
+};
 
 export default App;

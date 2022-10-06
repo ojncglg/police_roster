@@ -15,28 +15,26 @@ const Title = styled.div`
   font-size: 2rem;
 `;
 
-class Documentation extends React.Component {
-  render() {
-    return (
-      <Container>
-        <div>
-          <Title>Documentation</Title>
-          <DocumentComponent
-            title="Loading spinner "
-            component={<Loading />}
-            propDocs={[
-              {
-                prop: "size",
-                description: "Changes the size of the loading spinner",
-                type: "string",
-                defaultValue: "medium",
-              },
-            ]}
-          />
-        </div>
-      </Container>
-    );
-  }
-}
+const Documentation = () => {
+  return (
+    <Container>
+      <div>
+        <Title>Documentation</Title>
+        <DocumentComponent
+          title="Loading spinner "
+          component={<Loading />}
+          propDocs={[
+            {
+              prop: "size",
+              description: "Changes the size of the loading spinner",
+              type: "string",
+              defaultValue: "medium",
+            },
+          ]}
+        />
+      </div>
+    </Container>
+  );
+};
 
 export default Documentation;

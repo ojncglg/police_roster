@@ -21,7 +21,7 @@ const Timer = styled.div`
 
 const TimerTitle = styled.div``;
 
-function App() {
+const TimersView = () => {
   const timers = [
     { title: "Stopwatch", C: <Stopwatch /> },
     { title: "Countdown", C: <Countdown /> },
@@ -39,6 +39,6 @@ function App() {
       ))}
     </Timers>
   );
-}
+};
 
-export default App;
+export default TimersView;

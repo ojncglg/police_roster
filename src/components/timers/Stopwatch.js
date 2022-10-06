@@ -1,9 +1,3 @@
-import React from "react";
-
-class Stopwatch extends React.Component {
-  render() {
-    return null;
-  }
-}
+const Stopwatch = () => null;
 
 export default Stopwatch;

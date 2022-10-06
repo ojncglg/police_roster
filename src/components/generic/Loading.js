@@ -56,34 +56,24 @@ const DotGroup = styled.div`
   display: flex;
 `;
 
-class Loading extends React.Component {
-  render() {
-    const size = sizeMapping[this.props.size];
-    const { color } = this.props;
-
-    return (
-      <Container>
-        <DotGroup>
-          <Dot size={size} color={color} />
-          <Dot size={size} color={color} />
-        </DotGroup>
-        <DotGroup>
-          <Dot size={size} color={color} />
-          <Dot size={size} color={color} />
-        </DotGroup>
-      </Container>
-    );
-  }
-}
+const Loading = ({ size = "medium", color = primaryColor }) => {
+  return (
+    <Container>
+      <DotGroup>
+        <Dot size={sizeMapping[size]} color={color} />
+        <Dot size={sizeMapping[size]} color={color} />
+      </DotGroup>
+      <DotGroup>
+        <Dot size={sizeMapping[size]} color={color} />
+        <Dot size={sizeMapping[size]} color={color} />
+      </DotGroup>
+    </Container>
+  );
+};
 
 Loading.propTypes = {
   size: PropTypes.oneOf(["small", "medium", "large"]),
   color: PropTypes.string,
-};
-
-Loading.defaultProps = {
-  size: "medium",
-  color: primaryColor,
 };
 
 export default Loading;
