@@ -32,7 +32,7 @@ const TimersView = () => {
   return (
     <Timers>
       {timers.map((timer) => (
-        <Timer>
+        <Timer key={`timer-${timer.title}`}>
           <TimerTitle>{timer.title}</TimerTitle>
           {timer.C}
         </Timer>
