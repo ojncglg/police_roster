@@ -2,7 +2,7 @@
 
 ## Objective
 
-For Assignment 1 (A1) we are going to be building four different timer components that we will be used in future assignments.
+For Assignment 1 (A1) we are going to be building four different timer components that we will use in future assignments.
 
 ## What are we building?
 
@@ -19,10 +19,11 @@ Our larger components are going to be `Stopwatch`, `Countdown`, `XY`, and `Tabat
 
 ## Deliverable
 
-1. Get all 4 types of timers to work. The timers should have a Pause/Resume button, a reset button, and a "fast forward" button (ends the timer). All timers should render at `localhost:3000`. You should try to DRY up your code by creating generic components that are going to be used by your timers. The most basic ones, but not limited to, are going to be a `Button`, `Input`, `DisplayTime`, `DisplayRounds`, and `Panel` (that handles layout of your timer).
-2. Style your components in a way that they are consistent and look presentable. Do not use an existing UI design library (e.g. MUI or Antd), instead try to come up with your own. **You are welcome to search the internet for design inspiration, but make sure to cite all resources you have used.**
-3. Document all of the generic components you have created. In order to do this navigate to `src/view/Documentation` and add your components 1 by 1 with documentation of all props. We have provided an example loading spinner that you can follow.
-4. Deploy your application using any method you like (we will provide instructions for GH actions): **URL_TO_APP**
+1. Get all 4 types of timers to work. The timers should have a pause/resume button, a reset button, and a "fast forward" button (ends the timer). All timers should render at `localhost:3000`. 
+2. You should try to DRY up your code by creating generic components that are going to be used by your timers. The most basic ones, but not limited to, are going to be a `Button`, `Input`, `DisplayTime`, `DisplayRounds`, and `Panel` (that handles layout of your timer). 
+3. For now you are going to want to store all state in the timers themselves.
+4. Style your components in a way that they are consistent and look presentable. Do not use an existing UI design library (e.g. MUI or Antd), instead try to come up with your own. **You are welcome to search the internet for design inspiration, but make sure to cite all resources you have used.**
+5. Deploy your application using any method you like (we will provide instructions for GH actions): **URL_TO_APP**
 
 ### Deployment Instructions (Github actions)
 
@@ -30,16 +31,14 @@ Our larger components are going to be `Stopwatch`, `Countdown`, `XY`, and `Tabat
 
 ## Grading rubric
 
-- All timers are functioning correctly
+- All 4 timers are working correctly. Timers should have pause/resume button, a reset button, and a button that ends the timer.
 - UI is consistent and effort has been put into making it look nice. Cite any resources you used.
-- Assemble all timers and render them. They for the most part should be static and not functional.
 - Keep your code as DRY (Don't repeat yourself) as possible
-- Define PropTypes for all components
 - The console should be free of errors and warnings
 
 ## Bonus (5pt)
 
-- Add documentation for your components. A template for this documentation can be found at `/docs`.
+- Document all of your generic components. A template for this documentation can be found at `/docs`.
 
 ## Install and Run Project
 
