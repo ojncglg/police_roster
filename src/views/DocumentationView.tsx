@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 
 import DocumentComponent from "../components/documentation/DocumentComponent";
@@ -25,7 +24,7 @@ const Documentation = () => {
         <Title>Documentation</Title>
         <DocumentComponent
           title="Loading spinner "
-          component={<Loading />}
+          component={<Loading size="medium" color="#ffa2bf" />}
           propDocs={[
             {
               prop: "size",

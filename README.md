@@ -19,22 +19,18 @@ Our larger components are going to be `Stopwatch`, `Countdown`, `XY`, and `Tabat
 
 ## Deliverable
 
-1. Get all 4 types of timers to work. The timers should have a pause/resume button, a reset button, and a "fast forward" button (ends the timer). All timers should render at `localhost:3000`. 
-2. You should try to DRY up your code by creating generic components that are going to be used by your timers. The most basic ones, but not limited to, are going to be a `Button`, `Input`, `DisplayTime`, `DisplayRounds`, and `Panel` (that handles layout of your timer). 
+1. Get all 4 types of timers to work. The timers should have a pause/resume button, a reset button, and a "fast forward" button (ends the timer). All timers should render at `localhost:3000`.
+2. You should try to DRY up your code by creating generic components that are going to be used by your timers. The most basic ones, but not limited to, are going to be a `Button`, `Input`, `DisplayTime`, `DisplayRounds`, and `Panel` (that handles layout of your timer).
 3. For now you are going to want to store all state in the timers themselves.
 4. Style your components in a way that they are consistent and look presentable. Do not use an existing UI design library (e.g. MUI or Antd), instead try to come up with your own. **You are welcome to search the internet for design inspiration, but make sure to cite all resources you have used.**
-5. Deploy your application using any method you like (we will provide instructions for GH actions): **URL_TO_APP**
-
-### Deployment Instructions (Github actions)
-
-[Deployment instructions](https://github.com/prof-tejera/react-deployment-code#github-actions)
+5. Deploy your application to Github pages.
 
 ## Grading rubric
 
-- All 4 timers are working correctly. Timers should have pause/resume button, a reset button, and a button that ends the timer.
+- All 4 timers are working correctly. Timers should have pause/resume button, a reset button, and a button that ends the timer (puts the timer in completed state).
 - UI is consistent and effort has been put into making it look nice. Cite any resources you used.
 - Keep your code as DRY (Don't repeat yourself) as possible
-- The console should be free of errors and warnings
+- The console should be free of JS erros, TS errors, and warnings
 
 ## Bonus (5pt)
 
@@ -51,7 +47,27 @@ npm i
 Run project
 
 ```
-npm start
+npm run dev
 ```
 
-Timers: `localhost:3000`. Documentation: `localhost:3000/docs`
+Timers: `localhost:5173`. Documentation: `localhost:5173/docs`
+
+## Deploy to GH-Pages
+
+**It is important that you follow these steps in the correct order:**
+
+1. Open `package.json` and update the `"homepage"` key with your repo information. It should change from:
+
+`"homepage": "https://hes-e39.github.io/assignment-1/"`
+
+to
+
+`"homepage": "https://hes-e39.github.io/<your repo>/"`
+
+If you created this repo in github classrooms, the repo name should have your username at the end of it. Make sure to copy the whole thing. Also make sure the trailing `/` follows after your repo name.
+
+2. Push changes to GH
+3. Wait until actions finish, this will create a new branch `gh-pages` and run the deployment
+4. In your GH repo: Settings -> Pages -> Build and deployment -> Branch -> gh-pages
+
+You might have to hard refresh the browser page when pushing multiple updates to GH in order to reflect the most recent changes.

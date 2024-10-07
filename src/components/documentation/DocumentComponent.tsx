@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 
 const Wrapper = styled.div`
@@ -27,7 +26,20 @@ const RenderComponent = styled.div`
 
 const Documentation = styled.table``;
 
-const DocumentComponent = ({ title, component, propDocs }) => {
+const DocumentComponent = ({
+  title,
+  component,
+  propDocs,
+}: {
+  title: string;
+  component: React.ReactNode;
+  propDocs: {
+    prop: string;
+    description: string;
+    type: string;
+    defaultValue: string;
+  }[];
+}) => {
   return (
     <Wrapper>
       <Title>{title}</Title>
@@ -43,9 +55,9 @@ const DocumentComponent = ({ title, component, propDocs }) => {
             </tr>
           </thead>
           <tbody>
-            {propDocs.map((doc, index) => {
+            {propDocs.map((doc) => {
               return (
-                <tr key={index}>
+                <tr key={doc.description}>
                   <td>{doc.prop}</td>
                   <td>{doc.description}</td>
                   <td>{doc.type}</td>

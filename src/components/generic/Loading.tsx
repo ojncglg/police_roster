@@ -1,10 +1,10 @@
-import React from "react";
-import PropTypes from "prop-types";
 import styled from "styled-components";
 
 const primaryColor = "#ffa2bf";
 
-const sizeMapping = {
+type Size = "small" | "medium" | "large";
+
+const sizeMapping: Record<Size, number> = {
   small: 10,
   medium: 14,
   large: 20,
@@ -31,7 +31,7 @@ const Container = styled.div`
   }
 `;
 
-const Dot = styled.span`
+const Dot = styled.span<{ size: number }>`
   display: block;
   width: ${(props) => props.size}px;
   height: ${(props) => props.size}px;
@@ -56,7 +56,13 @@ const DotGroup = styled.div`
   display: flex;
 `;
 
-const Loading = ({ size = "medium", color = primaryColor }) => {
+const Loading = ({
+  size = "medium",
+  color = primaryColor,
+}: {
+  size: Size;
+  color: string;
+}) => {
   return (
     <Container>
       <DotGroup>
@@ -69,11 +75,6 @@ const Loading = ({ size = "medium", color = primaryColor }) => {
       </DotGroup>
     </Container>
   );
-};
-
-Loading.propTypes = {
-  size: PropTypes.oneOf(["small", "medium", "large"]),
-  color: PropTypes.string,
 };
 
 export default Loading;
