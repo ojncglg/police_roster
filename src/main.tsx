@@ -5,24 +5,29 @@ import {
   Outlet,
   RouterProvider,
   createHashRouter,
+  Navigate,
 } from "react-router-dom";
 
 import "./index.css";
+import "./styles/print.css"; // Import print styles
 import TimersView from "./views/TimersView";
 import DocumentationView from "./views/DocumentationView";
+import LoginView from "./views/LoginView";
+import RosterView from "./views/RosterView";
 
-const PageIndex = () => {
+const PageLayout = () => {
   return (
     <div>
-      <h1>Assignment</h1>
-      <ul>
-        <li>
-          <Link to="/">Timers</Link>
-        </li>
-        <li>
-          <Link to="/docs">Documentation</Link>
-        </li>
-      </ul>
+      <nav className="bg-gray-800 p-4 print:hidden">
+        <ul className="flex space-x-4 text-white">
+          <li>
+            <Link to="/roster" className="hover:text-gray-300">Roster Management</Link>
+          </li>
+          <li>
+            <Link to="/docs" className="hover:text-gray-300">Documentation</Link>
+          </li>
+        </ul>
+      </nav>
       <Outlet />
     </div>
   );
@@ -31,14 +36,22 @@ const PageIndex = () => {
 const router = createHashRouter([
   {
     path: "/",
-    element: <PageIndex />,
+    element: <Navigate to="/login" replace />,
+  },
+  {
+    path: "/login",
+    element: <LoginView />,
+  },
+  {
+    path: "/",
+    element: <PageLayout />,
     children: [
       {
-        index: true,
-        element: <TimersView />,
+        path: "roster",
+        element: <RosterView />,
       },
       {
-        path: "/docs",
+        path: "docs",
         element: <DocumentationView />,
       },
     ],

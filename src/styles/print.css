@@ -1,0 +1,164 @@
+/* Print-specific styles */
+@media print {
+  /* Hide non-printable elements */
+  .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Remove shadows and borders for cleaner print */
+  .print\\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  /* Reset margins for print */
+  .print\\:m-0 {
+    margin: 0 !important;
+  }
+
+  /* Ensure page breaks don't occur within elements */
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* Force page break before element */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  /* Reset background colors for better printing */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Ensure text is black for better printing */
+  body {
+    color: #000;
+    background: #fff;
+  }
+
+  /* Calendar specific print styles */
+  .calendar-grid {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .calendar-cell {
+    border: 1px solid #000;
+    padding: 8px;
+    vertical-align: top;
+  }
+
+  /* Ensure assignments are clearly visible */
+  .assignment-card {
+    border: 1px solid #000;
+    margin: 2px 0;
+    padding: 4px;
+  }
+
+  /* Header styling for print */
+  .print-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  /* Footer styling for print */
+  .print-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 10px;
+  }
+
+  /* Adjust font sizes for print */
+  h1 {
+    font-size: 24px !important;
+  }
+
+  h2 {
+    font-size: 20px !important;
+  }
+
+  h3 {
+    font-size: 16px !important;
+  }
+
+  /* Ensure color backgrounds print properly */
+  .bg-blue-100 {
+    background-color: #dbeafe !important;
+  }
+
+  .bg-green-100 {
+    background-color: #dcfce7 !important;
+  }
+
+  .bg-purple-100 {
+    background-color: #f3e8ff !important;
+  }
+
+  .bg-yellow-100 {
+    background-color: #fef9c3 !important;
+  }
+
+  .bg-pink-100 {
+    background-color: #fce7f3 !important;
+  }
+
+  .bg-indigo-100 {
+    background-color: #e0e7ff !important;
+  }
+
+  /* Ensure text colors print properly */
+  .text-blue-800 {
+    color: #1e40af !important;
+  }
+
+  .text-green-800 {
+    color: #166534 !important;
+  }
+
+  .text-purple-800 {
+    color: #6b21a8 !important;
+  }
+
+  .text-yellow-800 {
+    color: #854d0e !important;
+  }
+
+  .text-pink-800 {
+    color: #9d174d !important;
+  }
+
+  .text-indigo-800 {
+    color: #3730a3 !important;
+  }
+
+  /* Layout adjustments for print */
+  @page {
+    size: landscape;
+    margin: 0.5in;
+  }
+
+  /* Summary section styles */
+  .officer-summary {
+    break-inside: avoid;
+    margin-bottom: 15px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  /* Ensure proper spacing in printed calendar */
+  .calendar-day {
+    min-height: 100px;
+    border: 1px solid #000;
+  }
+
+  .calendar-header {
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid #000;
+  }
+}
