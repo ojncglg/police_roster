@@ -1,11 +1,11 @@
 import type React from 'react';
 import { useState } from 'react';
 import { useAppSettings } from '../../hooks/useAppSettings';
-import { useDarkMode } from '../../hooks/useDarkMode';
 import { notificationService } from '../../services/notificationService';
 import Button from './Button';
 import Modal from './Modal';
 import { ThemeSelect } from './ThemeToggle';
+import Select from './Select';
 
 interface SettingsPanelProps {
     isOpen: boolean;
@@ -14,8 +14,6 @@ interface SettingsPanelProps {
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
     const { settings, updatePreferences, resetAllSettings } = useAppSettings();
-
-    const { isDark } = useDarkMode();
 
     const [activeTab, setActiveTab] = useState<'general' | 'appearance' | 'shortcuts'>('general');
 
@@ -59,7 +57,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
                                     <input
                                         type="checkbox"
                                         checked={settings.preferences.showNotifications}
-                                        onChange={e => updatePreferences({ showNotifications: e.target.checked })}
+                                        onChange={(e) => updatePreferences({ showNotifications: e.target.checked })}
                                         className="h-4 w-4 text-police-yellow focus:ring-police-yellow border-gray-300 rounded"
                                     />
                                 </div>
@@ -69,7 +67,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
                                     <input
                                         type="checkbox"
                                         checked={settings.preferences.autoSave}
-                                        onChange={e => updatePreferences({ autoSave: e.target.checked })}
+                                        onChange={(e) => updatePreferences({ autoSave: e.target.checked })}
                                         className="h-4 w-4 text-police-yellow focus:ring-police-yellow border-gray-300 rounded"
                                     />
                                 </div>
@@ -79,7 +77,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
                                     <input
                                         type="checkbox"
                                         checked={settings.preferences.compactView}
-                                        onChange={e => updatePreferences({ compactView: e.target.checked })}
+                                        onChange={(e) => updatePreferences({ compactView: e.target.checked })}
                                         className="h-4 w-4 text-police-yellow focus:ring-police-yellow border-gray-300 rounded"
                                     />
                                 </div>
@@ -88,7 +86,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Default View</label>
                                     <Select
                                         value={settings.preferences.defaultView}
-                                        onChange={e => updatePreferences({ defaultView: e.target.value as 'officers' | 'roster' })}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updatePreferences({ defaultView: e.target.value as 'officers' | 'roster' })}
                                         className="mt-1"
                                         options={[
                                             { value: 'officers', label: 'Officers' },
@@ -101,7 +99,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ isOpen, onClose }) => {
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Items per Page</label>
                                     <Select
                                         value={settings.preferences.pageSize.toString()}
-                                        onChange={e => updatePreferences({ pageSize: Number(e.target.value) })}
+                                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updatePreferences({ pageSize: Number(e.target.value) })}
                                         className="mt-1"
                                         options={[
                                             { value: '10', label: '10' },

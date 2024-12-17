@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAppSettings } from './useAppSettings';
 
 interface UseDarkModeReturn {
@@ -12,7 +12,7 @@ interface UseDarkModeReturn {
 }
 
 export function useDarkMode(): UseDarkModeReturn {
-  const { settings, updateTheme } = useAppSettings();
+  const { updateTheme } = useAppSettings();
   const [isSystemDark, setIsSystemDark] = useState(() => 
     window.matchMedia('(prefers-color-scheme: dark)').matches
   );
@@ -24,6 +24,23 @@ export function useDarkMode(): UseDarkModeReturn {
 
   // Calculate if dark mode is active based on mode and system preference
   const isDark = mode === 'system' ? isSystemDark : mode === 'dark';
+
+  // Update theme class and store preference
+  const updateThemeClass = useCallback((dark: boolean) => {
+    if (dark) {
+      document.documentElement.classList.add('dark');
+      updateTheme({ mode: 'dark' });
+    } else {
+      document.documentElement.classList.remove('dark');
+      updateTheme({ mode: 'light' });
+    }
+
+    // Add transition class for smooth theme changes
+    document.documentElement.classList.add('theme-transition');
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transition');
+    }, 300);
+  }, [updateTheme]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -43,24 +60,7 @@ export function useDarkMode(): UseDarkModeReturn {
     updateThemeClass(isDark);
 
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [mode]);
-
-  // Update theme class and store preference
-  const updateThemeClass = (dark: boolean) => {
-    if (dark) {
-      document.documentElement.classList.add('dark');
-      updateTheme({ mode: 'dark' });
-    } else {
-      document.documentElement.classList.remove('dark');
-      updateTheme({ mode: 'light' });
-    }
-
-    // Add transition class for smooth theme changes
-    document.documentElement.classList.add('theme-transition');
-    setTimeout(() => {
-      document.documentElement.classList.remove('theme-transition');
-    }, 300);
-  };
+  }, [mode, isDark, updateThemeClass]);
 
   const setModeWithTransition = (newMode: 'light' | 'dark' | 'system') => {
     setMode(newMode);

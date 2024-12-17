@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Officer } from '../../types/officer';
+import { useState, useEffect } from 'react';
+import type { Officer } from '../../types/officer';
+import type { SortableValue } from '../../hooks/useTable';
 import { useTable } from '../../hooks/useTable';
 import { useModal } from '../../hooks/useModal';
 import { officerService } from '../../services/officerService';
@@ -9,12 +10,27 @@ import Card from '../common/Card';
 import Input from '../common/Input';
 import Modal, { ConfirmationModal } from '../common/Modal';
 import OfficerForm from './OfficerForm';
-import { LoadingContainer } from '../common/LoadingSpinner';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 const OfficerList = () => {
-  const [officers, setOfficers] = useState<Officer[]>(officerService.getAllOfficers());
+  const [officers, setOfficers] = useState<Officer[]>([]);
   const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
+  useEffect(() => {
+    const loadOfficers = () => {
+      try {
+        const data = officerService.getAllOfficers();
+        setOfficers(data);
+      } catch (error) {
+        notificationService.error('Failed to load officers');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadOfficers();
+  }, []);
+
   const {
     isOpen: isAddModalOpen,
     open: openAddModal,
@@ -37,10 +53,9 @@ const OfficerList = () => {
     data: displayedOfficers,
     handleFilterChange,
     handleSort,
-    sort,
     filter
-  } = useTable({
-    data: officers,
+  } = useTable<Officer & { [key: string]: SortableValue }>({
+    data: officers as (Officer & { [key: string]: SortableValue })[],
     initialSort: { field: 'lastName', direction: 'asc' },
     filterFn: (officer, filter) => {
       const searchTerm = filter.toLowerCase();
@@ -56,11 +71,13 @@ const OfficerList = () => {
   const handleAddOfficer = (officer: Officer) => {
     setOfficers(prev => [...prev, officer]);
     closeAddModal();
+    notificationService.success('Officer added successfully');
   };
 
   const handleEditOfficer = (officer: Officer) => {
     setOfficers(prev => prev.map(o => o.id === officer.id ? officer : o));
     closeEditModal();
+    notificationService.success('Officer updated successfully');
   };
 
   const handleDeleteOfficer = async () => {
@@ -93,6 +110,14 @@ const OfficerList = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <LoadingSpinner size="large" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -105,6 +130,7 @@ const OfficerList = () => {
             className="max-w-md"
             leftIcon={
               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <title>Search officers</title>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             }
@@ -115,6 +141,7 @@ const OfficerList = () => {
           className="bg-police-yellow hover:bg-yellow-600 text-black"
           icon={
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <title>Add new officer</title>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           }

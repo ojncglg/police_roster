@@ -110,10 +110,13 @@ export function useHotkeys(hotkeys: HotkeyConfig | HotkeyConfig[]) {
   }, []);
 
   useEffect(() => {
-    if (configs.some(config => config.options?.keydown !== false)) {
+    const hasKeydownHandlers = configs.some(config => config.options?.keydown !== false);
+    const hasKeyupHandlers = configs.some(config => config.options?.keyup === true);
+
+    if (hasKeydownHandlers) {
       window.addEventListener('keydown', handleKeyEvent);
     }
-    if (configs.some(config => config.options?.keyup === true)) {
+    if (hasKeyupHandlers) {
       window.addEventListener('keyup', handleKeyEvent);
     }
 
@@ -121,7 +124,7 @@ export function useHotkeys(hotkeys: HotkeyConfig | HotkeyConfig[]) {
       window.removeEventListener('keydown', handleKeyEvent);
       window.removeEventListener('keyup', handleKeyEvent);
     };
-  }, [handleKeyEvent]);
+  }, [handleKeyEvent, configs]);
 }
 
 // Helper hook for managing application-wide hotkeys
@@ -131,7 +134,7 @@ export function useAppHotkeys() {
       combo: 'ctrl+k',
       handler: () => {
         // Implement search functionality
-        console.log('Search hotkey pressed');
+        // TODO: Implement search functionality
       },
       options: {
         description: 'Open search',
@@ -141,7 +144,7 @@ export function useAppHotkeys() {
       combo: 'esc',
       handler: () => {
         // Close modals, dropdowns, etc.
-        console.log('Escape pressed');
+        // TODO: Implement modal/dropdown close functionality
       },
       options: {
         description: 'Close modal/dropdown',
@@ -149,9 +152,9 @@ export function useAppHotkeys() {
     },
     {
       combo: ['ctrl+s', 'cmd+s'],
-      handler: (e) => {
+      handler: () => {
         // Save current form/data
-        console.log('Save hotkey pressed');
+        // TODO: Implement save functionality
       },
       options: {
         description: 'Save changes',

@@ -9,7 +9,7 @@ interface WindowSize {
 }
 
 function getBreakpointValue(breakpoint: string): number {
-  return parseInt(breakpoint.replace(/[^\d]/g, ''), 10);
+  return Number.parseInt(breakpoint.replace(/[^\d]/g, ''), 10);
 }
 
 /**
@@ -53,7 +53,7 @@ function useWindowSize(): WindowSize {
 /**
  * Hook to check if the current viewport matches a media query
  */
-function useMediaQuery(query: string): boolean {
+export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { Roster, ShiftAssignment, Officer, Shift } from '../types/roster';
+import type { Roster, ShiftAssignment, Officer, Shift } from '../types/roster';
 
 export interface CalendarDay {
   date: Date;
@@ -16,8 +16,6 @@ export const getCalendarDays = (date: Date, roster: Roster): CalendarDay[] => {
   
   // Get the first day of the month
   const firstDayOfMonth = new Date(year, month, 1);
-  // Get the last day of the month
-  const lastDayOfMonth = new Date(year, month + 1, 0);
   
   // Get the day of the week of the first day (0-6, 0 = Sunday)
   const firstDayWeekday = firstDayOfMonth.getDay();
@@ -58,10 +56,10 @@ export const getCalendarDays = (date: Date, roster: Roster): CalendarDay[] => {
 
 export const formatTime = (timeString: string): string => {
   const [hours, minutes] = timeString.split(':');
-  const hour = parseInt(hours, 10);
+  const hour = Number.parseInt(hours, 10);
   const ampm = hour >= 12 ? 'PM' : 'AM';
   const hour12 = hour % 12 || 12;
-  return `${hour12}${minutes === '00' ? '' : ':' + minutes}${ampm}`;
+  return `${hour12}${minutes === '00' ? '' : `:${minutes}`}${ampm}`;
 };
 
 export const getMonthName = (date: Date): string => {

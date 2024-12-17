@@ -1,4 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { Component } from 'react';
 import { notificationService } from '../../services/notificationService';
 
 interface Props {
@@ -24,8 +25,8 @@ class ErrorBoundary extends Component<Props, State> {
     };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+  public componentDidCatch(error: Error) {
+    console.error('Uncaught error:', error);
     notificationService.error('An unexpected error occurred. Please try again.');
   }
 
@@ -39,7 +40,9 @@ class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-lg">
             <div className="text-center">
-              <svg
+                <svg
+                aria-label="Error Icon"
+                role="img"
                 className="mx-auto h-12 w-12 text-red-500"
                 fill="none"
                 stroke="currentColor"

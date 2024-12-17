@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Roster } from '../../types/roster';
-import { CalendarDay, getCalendarDays, formatTime, getMonthName, getShiftColor } from '../../utils/calendarHelpers';
+import type { Roster } from '../../types/roster';
+import { getCalendarDays, formatTime, getMonthName, getShiftColor } from '../../utils/calendarHelpers';
 import { exportToPDF, generateMonthlyReport } from '../../services/exportService';
 
 interface PrintableCalendarProps {

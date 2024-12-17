@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Roster, Officer, Shift, ShiftAssignment } from '../../types/roster';
+import { useState } from 'react';
+import type { Roster, ShiftAssignment } from '../../types/roster';
 import { rosterService } from '../../services/rosterService';
 
 interface ShiftAssignmentProps {
@@ -258,7 +258,8 @@ const ShiftAssignmentComponent = ({ roster, onAssignmentUpdate }: ShiftAssignmen
                           onClick={() => removeAssignment(assignment.date, assignment.officerId)}
                           className="text-red-600 hover:text-red-800"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-labelledby="removeIcon">
+                            <title id="removeIcon">Remove Assignment</title>
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                         </button>

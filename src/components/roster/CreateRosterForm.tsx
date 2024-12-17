@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Officer, Shift } from '../../types/roster';
+import type { Officer, Shift } from '../../types/roster';
 import { rosterService } from '../../services/rosterService';
 
 const CreateRosterForm = () => {
@@ -77,7 +77,7 @@ const CreateRosterForm = () => {
       }
 
       // Create new roster
-      const newRoster = rosterService.createRoster({
+      rosterService.createRoster({
         name: rosterName,
         startDate,
         endDate,

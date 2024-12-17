@@ -1,8 +1,7 @@
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useRosterShortcuts } from '../../hooks/useRosterShortcuts';
-import { useDarkMode } from '../../hooks/useDarkMode';
 import Button from '../common/Button';
 import NotificationContainer from '../common/NotificationContainer';
 import ErrorBoundary from '../common/ErrorBoundary';
@@ -13,7 +12,6 @@ import ThemeToggle from '../common/ThemeToggle';
 const AppLayout = () => {
   const location = useLocation();
   const { logout, user } = useAuth();
-  const { isDark } = useDarkMode();
   const [isShortcutsHelpOpen, setIsShortcutsHelpOpen] = useState(false);
   const [isSettingsPanelOpen, setIsSettingsPanelOpen] = useState(false);
 
@@ -43,12 +41,14 @@ const AppLayout = () => {
 
   const navItems = [
     { path: '/officers', label: 'Officers', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-labelledby="officersIcon">
+        <title id="officersIcon">Officers</title>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
       </svg>
     )},
     { path: '/roster', label: 'Roster', icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-labelledby="rosterIcon">
+        <title id="rosterIcon">Roster</title>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
       </svg>
     )},
@@ -103,7 +103,8 @@ const AppLayout = () => {
                 className="text-gray-300 hover:text-police-yellow p-2 rounded-md"
                 title="Settings"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-labelledby="settingsIcon">
+                  <title id="settingsIcon">Settings</title>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -115,7 +116,8 @@ const AppLayout = () => {
                 className="text-gray-300 hover:text-police-yellow p-2 rounded-md"
                 title="Keyboard Shortcuts (Press ?)"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-labelledby="shortcutsIcon">
+                  <title id="shortcutsIcon">Keyboard Shortcuts</title>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
               </button>
@@ -132,7 +134,9 @@ const AppLayout = () => {
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-labelledby="logoutIcon"
                   >
+                    <title id="logoutIcon">Logout</title>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"

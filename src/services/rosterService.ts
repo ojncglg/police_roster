@@ -1,4 +1,4 @@
-import { Roster, Officer, Shift, ShiftAssignment } from '../types/roster';
+import type { Roster, ShiftAssignment } from '../types/roster';
 
 const STORAGE_KEY = 'nccpd_rosters';
 
