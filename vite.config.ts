@@ -12,6 +12,9 @@ export default ({ mode }) => {
 
     return defineConfig({
         base,
+        server: {
+            port: 5173
+        },
         plugins: [
             react(),
             checker({

@@ -1,160 +1,109 @@
-import { Officer, OfficerFormData } from '../types/officer';
+import type { Officer, OfficerFormData } from '../types/officer';
 
-const STORAGE_KEY = 'nccpd_officers';
+interface OfficerServiceInterface {
+  getOfficers(): Officer[];
+  getAllOfficers(): Officer[];
+  createOfficer(data: OfficerFormData): Promise<Officer>;
+  updateOfficer(id: string, data: OfficerFormData): Promise<Officer>;
+  deleteOfficer(id: string): Promise<void>;
+  validateOfficerData(data: OfficerFormData): string[];
+  getOfficersByDistrict(district: string): Officer[];
+  getCommandStaff(): Officer[];
+}
 
-class OfficerService {
-  private static instance: OfficerService;
+class OfficerService implements OfficerServiceInterface {
+  private officers: Officer[] = [];
 
-  private constructor() {}
-
-  public static getInstance(): OfficerService {
-    if (!OfficerService.instance) {
-      OfficerService.instance = new OfficerService();
-    }
-    return OfficerService.instance;
+  getOfficers(): Officer[] {
+    return this.officers;
   }
 
-  private getOfficers(): Officer[] {
-    const officersJson = localStorage.getItem(STORAGE_KEY);
-    return officersJson ? JSON.parse(officersJson) : [];
+  getAllOfficers(): Officer[] {
+    return this.officers;
   }
 
-  private saveOfficers(officers: Officer[]): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(officers));
-  }
-
-  public createOfficer(officerData: OfficerFormData): Officer {
-    const officers = this.getOfficers();
-    
-    // Validate badge number uniqueness
-    if (officers.some(o => o.badgeNumber === officerData.badgeNumber)) {
-      throw new Error('Badge number already exists');
-    }
-
-    const now = new Date().toISOString();
+  async createOfficer(data: OfficerFormData): Promise<Officer> {
     const newOfficer: Officer = {
-      ...officerData,
-      id: `off_${Date.now()}`,
-      createdAt: now,
-      updatedAt: now,
+      id: Math.random().toString(36).substr(2, 9),
+      ...data
     };
-
-    officers.push(newOfficer);
-    this.saveOfficers(officers);
+    this.officers.push(newOfficer);
     return newOfficer;
   }
 
-  public updateOfficer(id: string, officerData: Partial<OfficerFormData>): Officer {
-    const officers = this.getOfficers();
-    const index = officers.findIndex(o => o.id === id);
-    
+  async updateOfficer(id: string, data: OfficerFormData): Promise<Officer> {
+    const index = this.officers.findIndex(o => o.id === id);
     if (index === -1) {
       throw new Error('Officer not found');
     }
-
-    // Validate badge number uniqueness if it's being updated
-    if (officerData.badgeNumber && 
-        officers.some(o => o.badgeNumber === officerData.badgeNumber && o.id !== id)) {
-      throw new Error('Badge number already exists');
-    }
-
+    
     const updatedOfficer: Officer = {
-      ...officers[index],
-      ...officerData,
-      updatedAt: new Date().toISOString()
+      ...this.officers[index],
+      ...data,
+      id // Ensure id is preserved
     };
-
-    officers[index] = updatedOfficer;
-    this.saveOfficers(officers);
+    this.officers[index] = updatedOfficer;
     return updatedOfficer;
   }
 
-  public deleteOfficer(id: string): void {
-    const officers = this.getOfficers();
-    const filteredOfficers = officers.filter(o => o.id !== id);
-    
-    if (filteredOfficers.length === officers.length) {
+  async deleteOfficer(id: string): Promise<void> {
+    const index = this.officers.findIndex(o => o.id === id);
+    if (index === -1) {
       throw new Error('Officer not found');
     }
-
-    this.saveOfficers(filteredOfficers);
+    this.officers.splice(index, 1);
   }
 
-  public getOfficer(id: string): Officer | undefined {
-    return this.getOfficers().find(o => o.id === id);
-  }
-
-  public getAllOfficers(): Officer[] {
-    return this.getOfficers();
-  }
-
-  public getActiveOfficers(): Officer[] {
-    return this.getOfficers().filter(o => o.status === 'active');
-  }
-
-  public getOfficersByZone(zoneId: string): Officer[] {
-    return this.getOfficers().filter(o => o.zoneId === zoneId);
-  }
-
-  public getOfficersBySector(sectorId: string): Officer[] {
-    return this.getOfficers().filter(o => o.sectorId === sectorId);
-  }
-
-  public getOfficersBySpecialAssignment(assignmentId: string): Officer[] {
-    return this.getOfficers().filter(o => 
-      o.specialAssignments.includes(assignmentId)
-    );
-  }
-
-  public searchOfficers(query: string): Officer[] {
-    const searchTerm = query.toLowerCase();
-    return this.getOfficers().filter(officer => 
-      officer.firstName.toLowerCase().includes(searchTerm) ||
-      officer.lastName.toLowerCase().includes(searchTerm) ||
-      officer.badgeNumber.toLowerCase().includes(searchTerm) ||
-      officer.rank.toLowerCase().includes(searchTerm)
-    );
-  }
-
-  public validateOfficerData(data: Partial<OfficerFormData>): string[] {
+  validateOfficerData(data: OfficerFormData): string[] {
     const errors: string[] = [];
 
-    if (!data.badgeNumber?.trim()) {
+    if (!data.badgeNumber) {
       errors.push('Badge number is required');
-    } else if (!/^\d{1,6}$/.test(data.badgeNumber)) {
-      errors.push('Badge number must be 1-6 digits');
     }
-
-    if (!data.firstName?.trim()) {
+    if (!data.firstName) {
       errors.push('First name is required');
     }
-
-    if (!data.lastName?.trim()) {
+    if (!data.lastName) {
       errors.push('Last name is required');
     }
-
-    if (!data.rank?.trim()) {
+    if (!data.rank) {
       errors.push('Rank is required');
     }
-
-    if (!data.zoneId?.trim()) {
-      errors.push('Zone assignment is required');
+    if (!data.zone) {
+      errors.push('Zone is required');
     }
-
-    if (!data.sectorId?.trim()) {
-      errors.push('Sector assignment is required');
+    if (!data.sector) {
+      errors.push('Sector is required');
     }
-
-    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    if (data.email && !this.isValidEmail(data.email)) {
       errors.push('Invalid email format');
     }
-
-    if (data.phone && !/^\+?[\d\s-]{10,}$/.test(data.phone)) {
-      errors.push('Invalid phone number format');
+    if (data.phone && !this.isValidPhone(data.phone)) {
+      errors.push('Invalid phone format');
     }
 
     return errors;
   }
+
+  getOfficersByDistrict(district: string): Officer[] {
+    return this.officers.filter(officer => officer.sector.includes(district));
+  }
+
+  getCommandStaff(): Officer[] {
+    return this.officers.filter(officer => 
+      officer.rank.includes('Chief') || officer.rank.includes('Captain')
+    );
+  }
+
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  private isValidPhone(phone: string): boolean {
+    const phoneRegex = /^\+?[\d\s-()]{10,}$/;
+    return phoneRegex.test(phone);
+  }
 }
 
-export const officerService = OfficerService.getInstance();
+export const officerService = new OfficerService();

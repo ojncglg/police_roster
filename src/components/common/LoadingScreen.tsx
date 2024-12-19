@@ -1,14 +1,19 @@
-import React from 'react';
+import type { FC } from 'react';
+import LoadingSpinner from './LoadingSpinner';
 
 interface LoadingScreenProps {
   message?: string;
 }
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ 
+const LoadingScreen: FC<LoadingScreenProps> = ({ 
   message = 'Loading...' 
 }) => {
   return (
-    <div className="min-h-screen bg-police-black flex flex-col items-center justify-center">
+    <div 
+      className="min-h-screen bg-police-black flex flex-col items-center justify-center"
+      role="status"
+      aria-label="Loading application"
+    >
       <div className="text-center">
         {/* Police Badge Animation */}
         <div className="mb-8 relative">
@@ -18,7 +23,10 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
+              aria-hidden="true"
+              role="img"
             >
+              <title>Police badge</title>
               <path 
                 strokeLinecap="round" 
                 strokeLinejoin="round" 
@@ -29,7 +37,10 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
           </div>
           {/* Loading Spinner */}
           <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-            <div className="w-12 h-12 border-4 border-police-yellow border-t-transparent rounded-full animate-spin"></div>
+            <LoadingSpinner 
+              size="medium"
+              color="police-yellow"
+            />
           </div>
         </div>
 
@@ -46,19 +57,21 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
       <div className="mt-8 w-64">
         <div className="h-1 w-full bg-gray-800 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-police-yellow animate-[loading_2s_ease-in-out_infinite]"
-            style={{
-              width: '100%',
-              animation: 'loading 2s ease-in-out infinite',
-            }}
-          ></div>
+            className="h-full bg-police-yellow animate-loading"
+            aria-hidden="true"
+          />
         </div>
+      </div>
+
+      {/* Screen reader text */}
+      <div className="sr-only" aria-live="polite">
+        {message}
       </div>
     </div>
   );
 };
 
-// Add loading animation keyframes to the document
+// Add loading animation to tailwind config instead of inline styles
 const style = document.createElement('style');
 style.textContent = `
   @keyframes loading {
@@ -71,6 +84,11 @@ style.textContent = `
     100% {
       transform: translateX(-100%);
     }
+  }
+
+  .animate-loading {
+    width: 100%;
+    animation: loading 2s ease-in-out infinite;
   }
 `;
 document.head.appendChild(style);

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Roster } from '../../types/roster';
+import type { Officer } from '../../types/officer';
 import { getCalendarDays, formatTime, getMonthName, getShiftColor } from '../../utils/calendarHelpers';
 import { exportToPDF, generateMonthlyReport } from '../../services/exportService';
 
@@ -8,6 +9,19 @@ interface PrintableCalendarProps {
   month: Date;
   onClose: () => void;
 }
+
+const getOfficerDisplayName = (officer: Officer): string => {
+  return `${officer.firstName} ${officer.lastName}`;
+};
+
+const getStatusColor = (status: Officer['status']): string => {
+  switch (status) {
+    case 'active': return 'text-green-600';
+    case 'leave': return 'text-amber-600';
+    case 'training': return 'text-blue-600';
+    default: return 'text-red-600';
+  }
+};
 
 const PrintableCalendar = ({ roster, month, onClose }: PrintableCalendarProps) => {
   const [isExporting, setIsExporting] = useState(false);
@@ -92,13 +106,20 @@ const PrintableCalendar = ({ roster, month, onClose }: PrintableCalendarProps) =
               </div>
             </div>
             <div className="border rounded-lg p-4">
-              <h3 className="font-bold text-gray-800 mb-2">Shift Distribution</h3>
+              <h3 className="font-bold text-gray-800 mb-2">Officer Status</h3>
               <div className="grid grid-cols-2 gap-2">
-                {Object.entries(monthlyStats.shiftDistribution).map(([shift, count]) => (
-                  <div key={shift} className="text-sm">
-                    {shift}: {count} assignments
-                  </div>
-                ))}
+                <div className="text-sm text-green-600">
+                  Active: {roster.officers.filter(o => o.status === 'active').length}
+                </div>
+                <div className="text-sm text-amber-600">
+                  On Leave: {roster.officers.filter(o => o.status === 'leave').length}
+                </div>
+                <div className="text-sm text-blue-600">
+                  In Training: {roster.officers.filter(o => o.status === 'training').length}
+                </div>
+                <div className="text-sm text-red-600">
+                  Inactive: {roster.officers.filter(o => o.status === 'inactive').length}
+                </div>
               </div>
             </div>
           </div>
@@ -119,10 +140,32 @@ const PrintableCalendar = ({ roster, month, onClose }: PrintableCalendarProps) =
                   className={`
                     min-h-[150px] p-2 border border-gray-300
                     ${day.isCurrentMonth ? 'bg-white' : 'bg-gray-50'}
+                    ${day.shiftInfo.isWorkDay ? 
+                      day.shiftInfo.shiftType === 'night' ? 
+                        'bg-indigo-50 print:bg-indigo-50' : 
+                        'bg-amber-50 print:bg-amber-50'
+                      : ''}
                   `}
                 >
-                  <div className="font-bold text-gray-700 mb-2">
-                    {day.date.getDate()}
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="font-bold text-gray-700">
+                      {day.date.getDate()}
+                      {day.shiftInfo.isWorkDay && (
+                        <span className="ml-1 text-xs font-medium">
+                          {day.shiftInfo.shiftType === 'night' ? '🌙' : '☀️'}
+                          {day.shiftInfo.weekNumber && ` W${day.shiftInfo.weekNumber}`}
+                        </span>
+                      )}
+                    </div>
+                    {day.shiftInfo.isWorkDay && (
+                      <span className={`text-xs font-medium ${
+                        day.shiftInfo.shiftType === 'night' ? 
+                          'text-indigo-600' : 
+                          'text-amber-600'
+                      }`}>
+                        {day.shiftInfo.shiftType === 'night' ? 'Night' : 'Day'}
+                      </span>
+                    )}
                   </div>
                   <div className="space-y-1 text-sm">
                     {day.assignments.map((assignment, idx) => (
@@ -130,11 +173,21 @@ const PrintableCalendar = ({ roster, month, onClose }: PrintableCalendarProps) =
                         key={idx}
                         className={`p-1 rounded ${getShiftColor(assignment.shift.name)}`}
                       >
-                        <div className="font-medium">{assignment.officer.name}</div>
+                        <div className="font-medium">
+                          {getOfficerDisplayName(assignment.officer)}
+                          {assignment.officer.specialAssignment && (
+                            <span className="ml-1 text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-0.5">
+                              {assignment.officer.specialAssignment}
+                            </span>
+                          )}
+                        </div>
                         <div className="text-xs">
                           {assignment.shift.name} ({formatTime(assignment.shift.startTime)}-{formatTime(assignment.shift.endTime)})
                         </div>
                         <div className="text-xs italic">{assignment.position}</div>
+                        <div className={`text-xs ${getStatusColor(assignment.officer.status)}`}>
+                          ({assignment.officer.status})
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -143,17 +196,61 @@ const PrintableCalendar = ({ roster, month, onClose }: PrintableCalendarProps) =
             </div>
           </div>
 
+          {/* Shift Rotation Summary */}
+          <div className="mt-8 mb-8 page-break-before">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Shift Rotation Pattern</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="border rounded p-4">
+                <h4 className="font-bold text-gray-800 mb-2">Night Shifts</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <span className="text-indigo-600 mr-2">🌙</span>
+                    <span>Week 1: 4 consecutive nights</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-indigo-600 mr-2">🌙</span>
+                    <span>Week 2: 4 consecutive nights (after 5 days break)</span>
+                  </div>
+                </div>
+              </div>
+              <div className="border rounded p-4">
+                <h4 className="font-bold text-gray-800 mb-2">Day Shifts</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <span className="text-amber-600 mr-2">☀️</span>
+                    <span>Week 1: 4 consecutive days</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-amber-600 mr-2">☀️</span>
+                    <span>Week 2: 4 consecutive days (after 5 days break)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Officer Workload Summary */}
           <div className="mt-8 page-break-before">
             <h3 className="text-xl font-bold text-gray-800 mb-4">Officer Workload Summary</h3>
             <div className="grid grid-cols-2 gap-4">
-              {Object.entries(monthlyStats.officerWorkload).map(([officerName, count]) => (
-                <div key={officerName} className="border rounded p-3">
+              {roster.officers.map((officer) => (
+                <div key={officer.id} className="border rounded p-3">
                   <div className="font-bold text-gray-800">
-                    {officerName}
+                    {getOfficerDisplayName(officer)}
+                    {officer.specialAssignment && (
+                      <span className="ml-2 text-sm bg-blue-100 text-blue-800 rounded-full px-2 py-0.5">
+                        {officer.specialAssignment}
+                      </span>
+                    )}
                   </div>
                   <div className="text-sm text-gray-600">
-                    Total Assignments: {count}
+                    Badge: {officer.badgeNumber}
+                    <span className={`ml-2 ${getStatusColor(officer.status)}`}>
+                      ({officer.status})
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    Total Assignments: {monthlyStats.officerWorkload[officer.id] || 0}
                   </div>
                 </div>
               ))}

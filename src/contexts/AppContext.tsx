@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useEffect } from 'react';
-import { useAppSettings, type AppSettings } from '../hooks/useAppSettings';
+import { createContext, useContext, useEffect, type ReactNode } from 'react';
+import { useAppSettings } from '../hooks/useAppSettings';
+import type { AppSettings } from '../hooks/useAppSettings';
+import { initializeData } from '../data/initialize';
 
 interface AppContextType {
   settings: AppSettings;
@@ -14,7 +16,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | null>(null);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+export function AppProvider({ children }: { children: ReactNode }) {
   const {
     settings,
     updateTheme,
@@ -26,37 +28,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     isShortcutCustomized,
   } = useAppSettings();
 
+  // Initialize application data
+  useEffect(() => {
+    initializeData();
+  }, []);
+
   // Apply theme settings to document
   useEffect(() => {
     const root = document.documentElement;
-    const { theme } = settings;
-
-    // Update CSS variables
-    root.style.setProperty('--color-primary', theme.primaryColor);
-    root.style.setProperty('--color-accent', theme.accentColor);
-
-    // Update theme mode
-    if (theme.mode === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [settings.theme]);
+    root.style.setProperty('--color-primary', settings.theme.primaryColor);
+    root.style.setProperty('--color-accent', settings.theme.accentColor);
+  }, [settings]);
 
   // Apply preferences
   useEffect(() => {
-    const { preferences } = settings;
-
-    // Apply compact view
-    if (preferences.compactView) {
+    if (settings.preferences.compactView) {
       document.body.classList.add('compact-view');
     } else {
       document.body.classList.remove('compact-view');
     }
-
-    // Store preferences in localStorage for persistence
-    localStorage.setItem('nccpd_preferences', JSON.stringify(preferences));
-  }, [settings.preferences]);
+    localStorage.setItem('nccpd_preferences', JSON.stringify(settings.preferences));
+  }, [settings]);
 
   const value: AppContextType = {
     settings,

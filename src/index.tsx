@@ -8,56 +8,21 @@ import './index.css';
 import './styles/print.css';
 import './styles/animations.css';
 
-// Add custom styles
-const style = document.createElement('style');
-style.textContent = `
-  :root {
-    --color-police-yellow: #FFD700;
-    --color-police-black: #000000;
-    --color-police-gold: #FFB700;
-  }
+// Initialize theme based on stored preference or system preference
+const storedMode = localStorage.getItem('color-mode') as 'light' | 'dark' | 'system' || 'system';
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const shouldBeDark = storedMode === 'system' ? prefersDark : storedMode === 'dark';
 
-  body {
-    background-color: #f8f9fa;
-  }
+if (shouldBeDark) {
+  document.documentElement.classList.add('dark');
+} else {
+  document.documentElement.classList.remove('dark');
+}
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-police-yellow);
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-police-gold);
-  }
-
-  /* Focus styles */
-  *:focus {
-    outline: 2px solid var(--color-police-yellow);
-    outline-offset: 2px;
-  }
-
-  /* Selection styles */
-  ::selection {
-    background-color: var(--color-police-yellow);
-    color: var(--color-police-black);
-  }
-`;
-
-document.head.appendChild(style);
-
-// biome-ignore lint/style/noNonNullAssertion: root html element is there
-const rootElement = document.getElementById('root') as HTMLElement;
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Failed to find the root element');
+}
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>

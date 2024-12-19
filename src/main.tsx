@@ -1,98 +1,11 @@
-import { StrictMode, lazy, Suspense } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  RouterProvider,
-  createHashRouter,
-  Navigate,
-} from "react-router-dom";
-
 import "./index.css";
 import "./styles/print.css";
 import "./styles/animations.css";
-
 import { AppProvider } from "./contexts/AppContext";
-import AppLayout from "./components/layout/AppLayout";
-import LoginView from "./views/LoginView";
-import DefaultError from "./components/common/DefaultError";
-import LoadingScreen from "./components/common/LoadingScreen";
-import { withAuth } from "./hocs/withAuth";
-import { withRouteLoader } from "./components/common/RouteLoader";
-
-// Lazy load route components
-const OfficersView = lazy(() => import("./views/OfficersView"));
-const RosterView = lazy(() => import("./views/RosterView"));
-const DocumentationView = lazy(() => import("./views/DocumentationView"));
-
-// Wrap components with auth and loading
-const ProtectedOfficersView = withRouteLoader(OfficersView, {
-  requireAuth: true,
-  loadingMessage: "Loading officer management..."
-});
-
-const ProtectedRosterView = withRouteLoader(withAuth(RosterView), {
-  requireAuth: true,
-  loadingMessage: "Loading roster management..."
-});
-
-const ProtectedDocumentationView = withRouteLoader(withAuth(DocumentationView), {
-  requireAuth: true,
-  loadingMessage: "Loading documentation..."
-});
-
-const router = createHashRouter([
-  {
-    path: "/",
-    element: <Navigate to="/login" replace />,
-    errorElement: <DefaultError />,
-  },
-  {
-    path: "/login",
-    element: (
-      <Suspense fallback={<LoadingScreen message="Loading login..." />}>
-        <LoginView />
-      </Suspense>
-    ),
-    errorElement: <DefaultError />,
-  },
-  {
-    path: "/",
-    element: <AppLayout />,
-    errorElement: <DefaultError />,
-    children: [
-      {
-        path: "officers",
-        element: <ProtectedOfficersView />,
-      },
-      {
-        path: "roster",
-        element: <ProtectedRosterView />,
-      },
-      {
-        path: "docs",
-        element: <ProtectedDocumentationView />,
-      },
-      // Catch-all redirect to officers page
-      {
-        path: "*",
-        element: <Navigate to="/officers" replace />,
-      },
-    ],
-  },
-]);
-
-// Add dark mode class based on system preference
-if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  document.documentElement.classList.add('dark');
-}
-
-// Watch for system dark mode changes
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-  if (e.matches) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
-});
+import { SessionProvider } from "./contexts/SessionContext";
+import App from "./App";
 
 // Add custom styles
 const style = document.createElement('style');
@@ -210,11 +123,14 @@ style.textContent = `
 
 document.head.appendChild(style);
 
-// biome-ignore lint/style/noNonNullAssertion: root html element is there
-createRoot(document.getElementById("root")!).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("Failed to find the root element");
+createRoot(rootElement).render(
   <StrictMode>
     <AppProvider>
-      <RouterProvider router={router} />
+      <SessionProvider>
+        <App />
+      </SessionProvider>
     </AppProvider>
   </StrictMode>
 );

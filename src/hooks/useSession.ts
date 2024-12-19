@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { authService, type User } from '../services/authService';
 import { notificationService } from '../services/notificationService';
 
@@ -16,7 +15,6 @@ const ACTIVITY_CHECK_INTERVAL = 60 * 1000; // 1 minute
 const ACTIVITY_WARNING_THRESHOLD = 5 * 60 * 1000; // 5 minutes
 
 export function useSession() {
-  const navigate = useNavigate();
   const [state, setState] = useState<SessionState>(() => {
     const storedSession = localStorage.getItem(SESSION_KEY);
     if (storedSession) {
@@ -33,6 +31,7 @@ export function useSession() {
         console.error('Error parsing session:', error);
       }
     }
+    
     return {
       user: null,
       isAuthenticated: false,
@@ -88,8 +87,7 @@ export function useSession() {
           // Show warning 5 minutes before expiry
           const minutesLeft = Math.ceil((ACTIVITY_TIMEOUT - timeElapsed) / 60000);
           notificationService.warning(
-            `Your session will expire in ${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}. ` +
-            'Please save your work.'
+            `Your session will expire in ${minutesLeft} minute${minutesLeft > 1 ? 's' : ''}. Please save your work.`
           );
         }
       }
@@ -111,7 +109,12 @@ export function useSession() {
       });
       return user;
     } catch (error) {
-      setState(prev => ({ ...prev, isLoading: false }));
+      updateSession({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        lastActivity: Date.now()
+      });
       throw error;
     }
   }, [updateSession]);
@@ -125,8 +128,7 @@ export function useSession() {
       isLoading: false,
       lastActivity: Date.now()
     });
-    navigate('/login');
-  }, [navigate]);
+  }, []);
 
   const refreshSession = useCallback(async () => {
     if (!state.isAuthenticated) return;
@@ -149,32 +151,4 @@ export function useSession() {
     refreshSession,
     updateActivity
   };
-}
-
-// Hook for requiring authentication
-export function useRequireAuth() {
-  const { isAuthenticated, isLoading } = useSession();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-
-  return { isAuthenticated, isLoading };
-}
-
-// Hook for preventing authenticated users from accessing certain routes
-export function usePreventAuthAccess() {
-  const { isAuthenticated, isLoading } = useSession();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      navigate('/officers');
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-
-  return { isAuthenticated, isLoading };
 }

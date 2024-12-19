@@ -2,6 +2,7 @@ export interface User {
   username: string;
   role: 'admin';
   lastLogin: string;
+  squad: 'A' | 'B' | 'C' | 'D';
 }
 
 export interface LoginCredentials {
@@ -23,14 +24,34 @@ class AuthService {
   }
 
   public async login(credentials: LoginCredentials): Promise<User> {
-    // TODO: Replace with actual API call
+    // Simulate API call with multiple admin users
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        if (credentials.username === 'admin' && credentials.password === 'admin') {
+        const validCredentials = [
+          { username: 'admin1', password: 'admin1' },
+          { username: 'admin2', password: 'admin2' },
+          { username: 'admin3', password: 'admin3' },
+          { username: 'admin4', password: 'admin4' }
+        ];
+
+        const matchedAdmin = validCredentials.find(
+          admin => admin.username === credentials.username && admin.password === credentials.password
+        );
+
+        if (matchedAdmin) {
+          // Assign squad based on admin username
+          const squadMap: Record<string, 'A' | 'B' | 'C' | 'D'> = {
+            'admin1': 'A',
+            'admin2': 'B',
+            'admin3': 'C',
+            'admin4': 'D'
+          };
+
           const user: User = {
-            username: credentials.username,
+            username: matchedAdmin.username,
             role: 'admin',
-            lastLogin: new Date().toISOString()
+            lastLogin: new Date().toISOString(),
+            squad: squadMap[matchedAdmin.username]
           };
           this.setUser(user);
           resolve(user);

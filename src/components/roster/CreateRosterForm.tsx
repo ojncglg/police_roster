@@ -1,6 +1,14 @@
 import { useState } from 'react';
-import type { Officer, Shift } from '../../types/roster';
+import type { Officer } from '../../types/officer';
+import type { Shift } from '../../types/roster';
+import { RANKS, SPECIAL_TEAMS } from '../../types/officer';
 import { rosterService } from '../../services/rosterService';
+
+type OfficerStatus = 'active' | 'inactive' | 'leave' | 'training';
+
+interface NewOfficer extends Omit<Officer, 'id' | 'status'> {
+  status: OfficerStatus;
+}
 
 const CreateRosterForm = () => {
   const [rosterName, setRosterName] = useState('');
@@ -14,11 +22,20 @@ const CreateRosterForm = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   // Officer form states
-  const [newOfficer, setNewOfficer] = useState({
+  const [newOfficer, setNewOfficer] = useState<NewOfficer>({
+    firstName: '',
+    lastName: '',
     badgeNumber: '',
-    name: '',
     rank: '',
-    unit: ''
+    zone: '',
+    sector: '',
+    specialAssignment: '',
+    email: '',
+    phone: '',
+    status: 'active',
+    notes: '',
+    specialAssignments: [],
+    isActive: true
   });
 
   // Shift form states
@@ -29,7 +46,7 @@ const CreateRosterForm = () => {
   });
 
   const handleAddOfficer = () => {
-    if (newOfficer.badgeNumber && newOfficer.name) {
+    if (newOfficer.badgeNumber && newOfficer.firstName && newOfficer.lastName) {
       setOfficers([
         ...officers,
         {
@@ -37,7 +54,21 @@ const CreateRosterForm = () => {
           ...newOfficer
         }
       ]);
-      setNewOfficer({ badgeNumber: '', name: '', rank: '', unit: '' });
+      setNewOfficer({
+        firstName: '',
+        lastName: '',
+        badgeNumber: '',
+        rank: '',
+        zone: '',
+        sector: '',
+        specialAssignment: '',
+        email: '',
+        phone: '',
+        status: 'active',
+        notes: '',
+        specialAssignments: [],
+        isActive: true
+      });
       setShowOfficerForm(false);
     }
   };
@@ -83,7 +114,8 @@ const CreateRosterForm = () => {
         endDate,
         officers,
         shifts,
-        assignments: []
+      assignments: [],
+      trainingDays: []
       });
 
       // Show success message
@@ -195,12 +227,23 @@ const CreateRosterForm = () => {
                 </div>
                 <div>
                   <label className="block text-gray-700 text-sm font-bold mb-2">
-                    Name
+                    First Name
                   </label>
                   <input
                     type="text"
-                    value={newOfficer.name}
-                    onChange={(e) => setNewOfficer({...newOfficer, name: e.target.value})}
+                    value={newOfficer.firstName}
+                    onChange={(e) => setNewOfficer({...newOfficer, firstName: e.target.value})}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newOfficer.lastName}
+                    onChange={(e) => setNewOfficer({...newOfficer, lastName: e.target.value})}
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   />
                 </div>
@@ -214,22 +257,40 @@ const CreateRosterForm = () => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   >
                     <option value="">Select Rank</option>
-                    <option value="Officer">Officer</option>
-                    <option value="Sergeant">Sergeant</option>
-                    <option value="Lieutenant">Lieutenant</option>
-                    <option value="Captain">Captain</option>
+                    {RANKS.map((rank) => (
+                      <option key={rank} value={rank}>{rank}</option>
+                    ))}
                   </select>
                 </div>
                 <div>
                   <label className="block text-gray-700 text-sm font-bold mb-2">
-                    Unit
+                    Special Assignment
                   </label>
-                  <input
-                    type="text"
-                    value={newOfficer.unit}
-                    onChange={(e) => setNewOfficer({...newOfficer, unit: e.target.value})}
+                  <select
+                    value={newOfficer.specialAssignment}
+                    onChange={(e) => setNewOfficer({...newOfficer, specialAssignment: e.target.value})}
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  />
+                  >
+                    <option value="">Select Special Assignment</option>
+                    {Object.entries(SPECIAL_TEAMS).map(([key, value]) => (
+                      <option key={key} value={key}>{value}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={newOfficer.status}
+                    onChange={(e) => setNewOfficer({...newOfficer, status: e.target.value as OfficerStatus})}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="leave">On Leave</option>
+                    <option value="training">In Training</option>
+                  </select>
                 </div>
               </div>
               <div className="mt-4 flex justify-end space-x-2">
@@ -256,10 +317,22 @@ const CreateRosterForm = () => {
             {officers.map((officer) => (
               <div key={officer.id} className="bg-gray-50 p-3 rounded-lg mb-2 flex justify-between items-center">
                 <div>
-                  <span className="font-bold">{officer.badgeNumber}</span> - {officer.name}
+                  <span className="font-bold">{officer.badgeNumber}</span> - {officer.firstName} {officer.lastName}
                   <span className="ml-2 text-gray-600">({officer.rank})</span>
+                  {officer.specialAssignment && (
+                    <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">
+                      {SPECIAL_TEAMS[officer.specialAssignment as keyof typeof SPECIAL_TEAMS] || officer.specialAssignment}
+                    </span>
+                  )}
                 </div>
-                <span className="text-gray-600">{officer.unit}</span>
+                <span className={`text-sm ${
+                  officer.status === 'active' ? 'text-green-600' :
+                  officer.status === 'leave' ? 'text-amber-600' :
+                  officer.status === 'training' ? 'text-blue-600' :
+                  'text-red-600'
+                }`}>
+                  {officer.status}
+                </span>
               </div>
             ))}
           </div>

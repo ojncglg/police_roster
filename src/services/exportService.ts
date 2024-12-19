@@ -1,5 +1,5 @@
 import html2pdf from 'html2pdf.js';
-import { Roster } from '../types/roster';
+import type { Roster } from '../types/roster';
 
 export const exportToPDF = async (elementId: string, roster: Roster, month: Date) => {
   const element = document.getElementById(elementId);
@@ -62,8 +62,9 @@ export const generateMonthlyReport = (roster: Roster, month: Date) => {
   monthlyAssignments.forEach(assignment => {
     const officer = roster.officers.find(o => o.id === assignment.officerId);
     if (officer) {
-      monthlyStats.officerWorkload[officer.name] = 
-        (monthlyStats.officerWorkload[officer.name] || 0) + 1;
+      const officerId = officer.id;
+      monthlyStats.officerWorkload[officerId] = 
+        (monthlyStats.officerWorkload[officerId] || 0) + 1;
     }
 
     const shift = roster.shifts.find(s => s.id === assignment.shiftId);

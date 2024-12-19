@@ -1,13 +1,15 @@
-import React, { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, type ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSession } from '../hooks/useSession';
 import LoadingScreen from '../components/common/LoadingScreen';
 
+import type { User } from '../services/authService';
+
 interface SessionContextType {
-  user: any;
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<any>;
+  login: (username: string, password: string) => Promise<User>;
   logout: () => void;
   refreshSession: () => Promise<void>;
   updateActivity: () => void;
@@ -20,37 +22,8 @@ const PUBLIC_ROUTES = ['/login', '/forgot-password', '/reset-password'];
 const DEFAULT_PRIVATE_ROUTE = '/officers';
 const DEFAULT_PUBLIC_ROUTE = '/login';
 
-export function SessionProvider({ children }: { children: React.ReactNode }) {
+export function SessionProvider({ children }: { children: ReactNode }) {
   const session = useSession();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { isLoading, isAuthenticated } = session;
-
-  useEffect(() => {
-    // Handle route protection
-    if (!isLoading) {
-      const isPublicRoute = PUBLIC_ROUTES.some(route => 
-        location.pathname.startsWith(route)
-      );
-
-      if (!isAuthenticated && !isPublicRoute) {
-        // Redirect to login if trying to access private route without auth
-        navigate(DEFAULT_PUBLIC_ROUTE, {
-          replace: true,
-          state: { from: location.pathname }
-        });
-      } else if (isAuthenticated && isPublicRoute) {
-        // Redirect to default private route if accessing public route while authenticated
-        navigate(DEFAULT_PRIVATE_ROUTE, { replace: true });
-      }
-    }
-  }, [isLoading, isAuthenticated, location.pathname, navigate]);
-
-  // Show loading screen while checking authentication
-  if (isLoading) {
-    return <LoadingScreen message="Checking authentication..." />;
-  }
-
   return (
     <SessionContext.Provider value={session}>
       {children}
@@ -76,7 +49,7 @@ export function withAuth<P extends object>(
     const navigate = useNavigate();
 
     useEffect(() => {
-      if (!isLoading && !isAuthenticated) {
+      if (!isLoading && !isAuthenticated && !PUBLIC_ROUTES.includes(location.pathname)) {
         navigate(DEFAULT_PUBLIC_ROUTE, {
           replace: true,
           state: { from: location.pathname }
@@ -88,7 +61,7 @@ export function withAuth<P extends object>(
       return <LoadingScreen message="Checking authentication..." />;
     }
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !PUBLIC_ROUTES.includes(location.pathname)) {
       return null;
     }
 
@@ -100,12 +73,13 @@ export function withAuth<P extends object>(
 export function usePreventAuthAccess() {
   const { isAuthenticated, isLoading } = useSessionContext();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (!isLoading && isAuthenticated && PUBLIC_ROUTES.includes(location.pathname)) {
       navigate(DEFAULT_PRIVATE_ROUTE, { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading, navigate, location.pathname]);
 
   return { isAuthenticated, isLoading };
 }
@@ -117,7 +91,7 @@ export function useRequireAuth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && !isAuthenticated && !PUBLIC_ROUTES.includes(location.pathname)) {
       navigate(DEFAULT_PUBLIC_ROUTE, {
         replace: true,
         state: { from: location.pathname }
@@ -138,7 +112,7 @@ export function useAuthForm() {
     await login(username, password);
     
     // Get the return path from location state, or use default
-    const from = (location.state as any)?.from || DEFAULT_PRIVATE_ROUTE;
+    const from = location.state?.from as string || DEFAULT_PRIVATE_ROUTE;
     navigate(from, { replace: true });
   };
 
@@ -146,6 +120,6 @@ export function useAuthForm() {
 }
 
 // Utility function to get return URL
-export function getReturnUrl(location: { state?: any }): string {
-  return (location.state as any)?.from || DEFAULT_PRIVATE_ROUTE;
+export function getReturnUrl(location: { state?: { from?: string } }): string {
+  return location.state?.from || DEFAULT_PRIVATE_ROUTE;
 }

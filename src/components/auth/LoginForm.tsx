@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authService } from '../../services/authService';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -15,14 +16,14 @@ const LoginForm = () => {
       return;
     }
 
-    // TODO: Implement actual authentication logic
-    // For now, we'll just do basic validation
-    if (username === 'admin' && password === 'admin') {
-      // Navigate to roster management on successful login
-      navigate('/roster');
-    } else {
-      setError('Invalid credentials');
-    }
+    // Use authService for login
+    authService.login({ username, password })
+      .then(() => {
+        navigate('/roster');
+      })
+      .catch((err: Error) => {
+        setError(err.message);
+      });
   };
 
   return (
@@ -68,7 +69,7 @@ const LoginForm = () => {
         </div>
       </form>
       <p className="text-center text-gray-500 text-xs">
-        Default credentials: admin/admin
+        Available admins: admin1, admin2, admin3, admin4 (password same as username)
       </p>
     </div>
   );

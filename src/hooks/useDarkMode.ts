@@ -17,7 +17,7 @@ export function useDarkMode(): UseDarkModeReturn {
     window.matchMedia('(prefers-color-scheme: dark)').matches
   );
 
-  // Get initial mode from settings or system preference
+  // Get initial mode from localStorage
   const [mode, setMode] = useState<'light' | 'dark' | 'system'>(
     localStorage.getItem('color-mode') as 'light' | 'dark' | 'system' || 'system'
   );
@@ -34,14 +34,9 @@ export function useDarkMode(): UseDarkModeReturn {
       document.documentElement.classList.remove('dark');
       updateTheme({ mode: 'light' });
     }
-
-    // Add transition class for smooth theme changes
-    document.documentElement.classList.add('theme-transition');
-    setTimeout(() => {
-      document.documentElement.classList.remove('theme-transition');
-    }, 300);
   }, [updateTheme]);
 
+  // Listen for system theme changes
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
@@ -52,22 +47,25 @@ export function useDarkMode(): UseDarkModeReturn {
       }
     };
 
-    // Add listener for system theme changes
     mediaQuery.addEventListener('change', handleChange);
-
-    // Initial setup
-    setIsSystemDark(mediaQuery.matches);
-    updateThemeClass(isDark);
-
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [mode, isDark, updateThemeClass]);
+  }, [mode, updateThemeClass]);
+
+  // Apply theme when mode or system preference changes
+  useEffect(() => {
+    const shouldBeDark = mode === 'system' ? isSystemDark : mode === 'dark';
+    updateThemeClass(shouldBeDark);
+  }, [mode, isSystemDark, updateThemeClass]);
 
   const setModeWithTransition = (newMode: 'light' | 'dark' | 'system') => {
     setMode(newMode);
     localStorage.setItem('color-mode', newMode);
 
-    const shouldBeDark = newMode === 'system' ? isSystemDark : newMode === 'dark';
-    updateThemeClass(shouldBeDark);
+    // Add transition class
+    document.documentElement.classList.add('theme-transition');
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transition');
+    }, 300);
   };
 
   const toggle = () => {
@@ -78,24 +76,6 @@ export function useDarkMode(): UseDarkModeReturn {
   const enable = () => setModeWithTransition('dark');
   const disable = () => setModeWithTransition('light');
 
-  // Add CSS variables for theme transitions
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      .theme-transition * {
-        transition: background-color 0.3s ease, 
-                    color 0.3s ease, 
-                    border-color 0.3s ease, 
-                    box-shadow 0.3s ease !important;
-      }
-    `;
-    document.head.appendChild(style);
-
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
   return {
     isDark,
     toggle,
@@ -105,43 +85,4 @@ export function useDarkMode(): UseDarkModeReturn {
     setMode: setModeWithTransition,
     mode
   };
-}
-
-// Helper function to get theme-aware color
-export function getThemeAwareColor(lightColor: string, darkColor: string): string {
-  const isDark = document.documentElement.classList.contains('dark');
-  return isDark ? darkColor : lightColor;
-}
-
-// Helper function to get CSS variable value
-export function getCSSVariable(name: string): string {
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
-}
-
-// Helper function to set CSS variable
-export function setCSSVariable(name: string, value: string): void {
-  document.documentElement.style.setProperty(name, value);
-}
-
-// Helper function to generate theme-aware styles
-export function createThemeAwareStyle(
-  lightStyles: Record<string, string>,
-  darkStyles: Record<string, string>
-): string {
-  const lightStylesStr = Object.entries(lightStyles)
-    .map(([prop, value]) => `${prop}: ${value};`)
-    .join('\n');
-
-  const darkStylesStr = Object.entries(darkStyles)
-    .map(([prop, value]) => `${prop}: ${value};`)
-    .join('\n');
-
-  return `
-    ${lightStylesStr}
-    .dark & {
-      ${darkStylesStr}
-    }
-  `;
 }

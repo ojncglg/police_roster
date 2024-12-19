@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, forwardRef } from 'react';
+import { type InputHTMLAttributes, forwardRef } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -22,14 +22,18 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
 }, ref) => {
   const baseInputStyles = `
     block rounded-md shadow-sm
+    bg-white dark:bg-gray-800
+    text-gray-900 dark:text-gray-100
+    placeholder-gray-400 dark:placeholder-gray-500
     focus:ring-2 focus:ring-offset-0
-    disabled:bg-gray-100 disabled:cursor-not-allowed
+    disabled:bg-gray-100 dark:disabled:bg-gray-900
+    disabled:cursor-not-allowed
     transition-colors duration-200
   `;
 
   const inputStateStyles = error
-    ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500'
-    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500';
+    ? 'border-red-300 dark:border-red-500 text-red-900 dark:text-red-100 placeholder-red-300 dark:placeholder-red-500 focus:ring-red-500 focus:border-red-500'
+    : 'border-gray-300 dark:border-gray-600 focus:ring-police-yellow focus:border-police-yellow';
 
   const widthStyles = fullWidth ? 'w-full' : '';
 
@@ -47,7 +51,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
       {label && (
         <label 
           htmlFor={props.id} 
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
         >
           {label}
         </label>
@@ -55,7 +59,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
       <div className="relative">
         {leftIcon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 sm:text-sm">{leftIcon}</span>
+            <span className="text-gray-500 dark:text-gray-400 sm:text-sm">{leftIcon}</span>
           </div>
         )}
         <input
@@ -70,13 +74,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
         />
         {rightIcon && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <span className="text-gray-500 sm:text-sm">{rightIcon}</span>
+            <span className="text-gray-500 dark:text-gray-400 sm:text-sm">{rightIcon}</span>
           </div>
         )}
       </div>
       {error && (
         <p 
-          className="mt-1 text-sm text-red-600" 
+          className="mt-1 text-sm text-red-600 dark:text-red-400" 
           id={`${props.id}-error`}
         >
           {error}
@@ -84,7 +88,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
       )}
       {helperText && !error && (
         <p 
-          className="mt-1 text-sm text-gray-500" 
+          className="mt-1 text-sm text-gray-500 dark:text-gray-400" 
           id={`${props.id}-helper-text`}
         >
           {helperText}
@@ -116,14 +120,17 @@ export const Select = forwardRef<HTMLSelectElement,
 }, ref) => {
   const baseSelectStyles = `
     block rounded-md shadow-sm
+    bg-white dark:bg-gray-800
+    text-gray-900 dark:text-gray-100
     focus:ring-2 focus:ring-offset-0
-    disabled:bg-gray-100 disabled:cursor-not-allowed
+    disabled:bg-gray-100 dark:disabled:bg-gray-900
+    disabled:cursor-not-allowed
     transition-colors duration-200
   `;
 
   const selectStateStyles = error
-    ? 'border-red-300 text-red-900 focus:ring-red-500 focus:border-red-500'
-    : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500';
+    ? 'border-red-300 dark:border-red-500 text-red-900 dark:text-red-100 focus:ring-red-500 focus:border-red-500'
+    : 'border-gray-300 dark:border-gray-600 focus:ring-police-yellow focus:border-police-yellow';
 
   const widthStyles = fullWidth ? 'w-full' : '';
 
@@ -139,7 +146,7 @@ export const Select = forwardRef<HTMLSelectElement,
       {label && (
         <label 
           htmlFor={props.id} 
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
         >
           {label}
         </label>
@@ -162,7 +169,7 @@ export const Select = forwardRef<HTMLSelectElement,
       </select>
       {error && (
         <p 
-          className="mt-1 text-sm text-red-600" 
+          className="mt-1 text-sm text-red-600 dark:text-red-400" 
           id={`${props.id}-error`}
         >
           {error}
@@ -170,7 +177,7 @@ export const Select = forwardRef<HTMLSelectElement,
       )}
       {helperText && !error && (
         <p 
-          className="mt-1 text-sm text-gray-500" 
+          className="mt-1 text-sm text-gray-500 dark:text-gray-400" 
           id={`${props.id}-helper-text`}
         >
           {helperText}

@@ -82,6 +82,33 @@ class RosterService {
     return roster?.assignments || [];
   }
 
+  public addTrainingDay(rosterId: string, trainingDay: { date: string; description?: string }): void {
+    const rosters = this.getRosters();
+    const rosterIndex = rosters.findIndex(roster => roster.id === rosterId);
+    
+    if (rosterIndex !== -1) {
+      const roster = rosters[rosterIndex];
+      roster.trainingDays = [...(roster.trainingDays || []), trainingDay];
+      this.saveRosters(rosters);
+    }
+  }
+
+  public removeTrainingDay(rosterId: string, date: string): void {
+    const rosters = this.getRosters();
+    const rosterIndex = rosters.findIndex(roster => roster.id === rosterId);
+    
+    if (rosterIndex !== -1) {
+      const roster = rosters[rosterIndex];
+      roster.trainingDays = roster.trainingDays.filter(td => td.date !== date);
+      this.saveRosters(rosters);
+    }
+  }
+
+  public getTrainingDays(rosterId: string): { date: string; description?: string }[] {
+    const roster = this.getRoster(rosterId);
+    return roster?.trainingDays || [];
+  }
+
   public clearAllData(): void {
     localStorage.removeItem(STORAGE_KEY);
   }

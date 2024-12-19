@@ -25,9 +25,21 @@ interface AppSettings {
   };
 }
 
+// Get initial theme mode from localStorage or system preference
+const getInitialThemeMode = (): 'light' | 'dark' => {
+  const storedMode = localStorage.getItem('color-mode');
+  if (storedMode === 'light' || storedMode === 'dark') {
+    return storedMode;
+  }
+  if (storedMode === 'system' || !storedMode) {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return 'light';
+};
+
 const DEFAULT_SETTINGS: AppSettings = {
   theme: {
-    mode: 'light',
+    mode: getInitialThemeMode(),
     primaryColor: '#FFD700', // Police Yellow
     accentColor: '#000000', // Police Black
   },
@@ -58,9 +70,15 @@ export function useAppSettings() {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
+        const parsedSettings = JSON.parse(stored);
         return {
           ...DEFAULT_SETTINGS,
-          ...JSON.parse(stored),
+          ...parsedSettings,
+          theme: {
+            ...DEFAULT_SETTINGS.theme,
+            ...parsedSettings.theme,
+            mode: getInitialThemeMode(), // Always use current theme mode
+          },
         };
       } catch (error) {
         console.error('Error parsing stored settings:', error);
@@ -127,7 +145,14 @@ export function useAppSettings() {
 
   // Reset all settings to defaults
   const resetAllSettings = () => {
-    setSettings(DEFAULT_SETTINGS);
+    const defaultWithCurrentTheme = {
+      ...DEFAULT_SETTINGS,
+      theme: {
+        ...DEFAULT_SETTINGS.theme,
+        mode: getInitialThemeMode(),
+      },
+    };
+    setSettings(defaultWithCurrentTheme);
     notificationService.success('Settings reset to defaults');
   };
 

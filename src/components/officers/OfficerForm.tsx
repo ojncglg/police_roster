@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
-import { Officer, OfficerFormData, RANKS, ZONES, SECTORS, SPECIAL_ASSIGNMENTS } from '../../types/officer';
+import type { Officer } from '../../types/officer';
+import { RANKS, ZONES, SECTORS, SPECIAL_ASSIGNMENTS } from '../../types/officer';
+import type { OfficerFormData } from '../../types/officer';
 import { useForm } from '../../hooks/useForm';
 import { officerService } from '../../services/officerService';
 import { notificationService } from '../../services/notificationService';
@@ -14,33 +16,62 @@ interface OfficerFormProps {
   onCancel: () => void;
 }
 
+interface ValidationError {
+  field: string;
+  message: string;
+}
+
+const defaultFormData: OfficerFormData = {
+  firstName: '',
+  lastName: '',
+  badgeNumber: '',
+  rank: '',
+  zone: '',
+  sector: '',
+  specialAssignment: '',
+  email: '',
+  phone: '',
+  status: 'active',
+  notes: '',
+  specialAssignments: [],
+  isActive: true
+};
+
 const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
-  const initialValues: OfficerFormData = {
-    badgeNumber: '',
-    firstName: '',
-    lastName: '',
-    rank: '',
-    email: '',
-    phone: '',
-    zoneId: '',
-    sectorId: '',
-    specialAssignments: [],
-    status: 'active',
-    notes: '',
-    ...officer,
-  };
+  const initialValues: OfficerFormData = officer
+    ? {
+        firstName: officer.firstName,
+        lastName: officer.lastName,
+        badgeNumber: officer.badgeNumber,
+        rank: officer.rank,
+        zone: officer.zone,
+        sector: officer.sector,
+        specialAssignment: officer.specialAssignment ?? '',
+        email: officer.email ?? '',
+        phone: officer.phone ?? '',
+        status: officer.status,
+        notes: officer.notes ?? '',
+        specialAssignments: officer.specialAssignments,
+        isActive: officer.isActive
+      }
+    : defaultFormData;
 
   const { values, errors, handleChange, handleSubmit, setValue } = useForm<OfficerFormData>({
     initialValues,
-    validate: (data) => {
-      const validationErrors = officerService.validateOfficerData(data);
-      return validationErrors.map(message => ({
+    validate: (data: Partial<OfficerFormData>) => {
+      // Create a complete form data by merging with default values
+      const completeData: OfficerFormData = {
+        ...defaultFormData,
+        ...data
+      };
+      const validationErrors = officerService.validateOfficerData(completeData);
+      return validationErrors.map((message: string): ValidationError => ({
         field: message.toLowerCase().includes('badge') ? 'badgeNumber' :
                message.toLowerCase().includes('first name') ? 'firstName' :
                message.toLowerCase().includes('last name') ? 'lastName' :
                message.toLowerCase().includes('rank') ? 'rank' :
-               message.toLowerCase().includes('zone') ? 'zoneId' :
-               message.toLowerCase().includes('sector') ? 'sectorId' :
+               message.toLowerCase().includes('zone') ? 'zone' :
+               message.toLowerCase().includes('sector') ? 'sector' :
                message.toLowerCase().includes('email') ? 'email' :
                message.toLowerCase().includes('phone') ? 'phone' : 'form',
         message
@@ -68,15 +99,18 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
 
   // Filter sectors based on selected zone
   const availableSectors = SECTORS.filter(
-    sector => sector.zoneId === values.zoneId
+    sector => sector.zoneId === values.zone
   );
 
   // Reset sector when zone changes
   useEffect(() => {
-    if (!availableSectors.find(s => s.id === values.sectorId)) {
-      setValue('sectorId', '');
+    if (!values.zone || !values.sector) return;
+    
+    const sectorExists = availableSectors.find(s => s.id === values.sector);
+    if (!sectorExists) {
+      setValue('sector', '');
     }
-  }, [values.zoneId]);
+  }, [values.zone, values.sector, availableSectors, setValue]);
 
   return (
     <Card className="max-w-2xl mx-auto">
@@ -146,10 +180,10 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
           {/* Zone */}
           <Select
             label="Zone"
-            name="zoneId"
-            value={values.zoneId}
+            name="zone"
+            value={values.zone}
             onChange={handleChange}
-            error={errors.zoneId}
+            error={errors.zone}
             options={ZONES.map(zone => ({ value: zone.id, label: zone.name }))}
             required
           />
@@ -157,15 +191,15 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
           {/* Sector */}
           <Select
             label="Sector"
-            name="sectorId"
-            value={values.sectorId}
+            name="sector"
+            value={values.sector}
             onChange={handleChange}
-            error={errors.sectorId}
+            error={errors.sector}
             options={availableSectors.map(sector => ({ 
               value: sector.id, 
               label: sector.name 
             }))}
-            disabled={!values.zoneId}
+            disabled={!values.zone}
             required
           />
 
@@ -186,7 +220,7 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
                         : values.specialAssignments.filter(id => id !== assignment.id);
                       setValue('specialAssignments', newAssignments);
                     }}
-                    className="rounded border-gray-300 text-police-yellow focus:ring-police-yellow"
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700">{assignment.name}</span>
                 </label>
@@ -219,7 +253,7 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
               value={values.notes}
               onChange={handleChange}
               rows={3}
-              className="shadow-sm focus:ring-police-yellow focus:border-police-yellow block w-full sm:text-sm border-gray-300 rounded-md"
+              className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
             />
           </div>
         </div>
@@ -236,7 +270,6 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
           <Button
             type="submit"
             variant="primary"
-            className="bg-police-yellow hover:bg-yellow-600 text-black"
           >
             {officer ? 'Update Officer' : 'Add Officer'}
           </Button>

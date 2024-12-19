@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface CardProps {
   children: ReactNode;
@@ -19,12 +19,12 @@ const Card = ({
   footer,
   onClick
 }: CardProps) => {
-  const baseStyles = 'rounded-lg overflow-hidden';
+  const baseStyles = 'rounded-lg overflow-hidden transition-colors duration-200';
 
   const variantStyles = {
-    default: 'bg-white',
-    outlined: 'bg-white border border-gray-200',
-    elevated: 'bg-white shadow-md'
+    default: 'bg-white dark:bg-gray-800',
+    outlined: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
+    elevated: 'bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-900'
   };
 
   const paddingStyles = {
@@ -34,7 +34,7 @@ const Card = ({
     large: 'p-6'
   };
 
-  const interactionStyles = onClick ? 'cursor-pointer hover:shadow-lg transition-shadow duration-200' : '';
+  const interactionStyles = onClick ? 'cursor-pointer hover:shadow-lg dark:hover:shadow-gray-900 transition-shadow duration-200' : '';
 
   return (
     <div
@@ -47,9 +47,10 @@ const Card = ({
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => e.key === 'Enter' && onClick() : undefined}
     >
       {header && (
-        <div className={`border-b border-gray-200 ${paddingStyles[padding]}`}>
+        <div className={`border-b border-gray-200 dark:border-gray-700 ${paddingStyles[padding]}`}>
           {header}
         </div>
       )}
@@ -57,7 +58,7 @@ const Card = ({
         {children}
       </div>
       {footer && (
-        <div className={`border-t border-gray-200 ${paddingStyles[padding]}`}>
+        <div className={`border-t border-gray-200 dark:border-gray-700 ${paddingStyles[padding]}`}>
           {footer}
         </div>
       )}
@@ -79,11 +80,11 @@ export const CardHeader = ({
   return (
     <div className={`flex justify-between items-start ${className}`}>
       <div>
-        <h3 className="text-lg font-medium text-gray-900">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
           {title}
         </h3>
         {subtitle && (
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {subtitle}
           </p>
         )}
@@ -105,7 +106,7 @@ export const CardContent = ({
   className?: string;
 }) => {
   return (
-    <div className={className}>
+    <div className={`text-gray-700 dark:text-gray-300 ${className}`}>
       {children}
     </div>
   );

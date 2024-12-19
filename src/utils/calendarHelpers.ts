@@ -1,4 +1,6 @@
 import type { Roster, ShiftAssignment, Officer, Shift } from '../types/roster';
+import type { ShiftType } from './shiftRotation';
+import { getShiftInfo } from './shiftRotation';
 
 export interface CalendarDay {
   date: Date;
@@ -8,6 +10,13 @@ export interface CalendarDay {
   })[];
   isCurrentMonth: boolean;
   isToday: boolean;
+  shiftInfo: {
+    isWorkDay: boolean;
+    shiftType: ShiftType;
+    weekNumber: 1 | 2 | null;
+  };
+  isTrainingDay?: boolean;
+  trainingDescription?: string;
 }
 
 export const getCalendarDays = (date: Date, roster: Roster): CalendarDay[] => {
@@ -33,8 +42,10 @@ export const getCalendarDays = (date: Date, roster: Roster): CalendarDay[] => {
     const currentDate = new Date(calendarStart);
     currentDate.setDate(currentDate.getDate() + i);
     
-    // Get assignments for this day
+    // Get the ISO date string for the current date
     const dateString = currentDate.toISOString().split('T')[0];
+    
+    // Get assignments for this day
     const dayAssignments = (roster.assignments || [])
       .filter(assignment => assignment.date === dateString)
       .map(assignment => ({
@@ -43,11 +54,17 @@ export const getCalendarDays = (date: Date, roster: Roster): CalendarDay[] => {
         shift: roster.shifts.find(s => s.id === assignment.shiftId)!
       }));
 
+    // Check if this is a training day
+    const trainingDay = roster.trainingDays?.find(td => td.date === dateString);
+    
     days.push({
       date: currentDate,
       assignments: dayAssignments,
       isCurrentMonth: currentDate.getMonth() === month,
-      isToday: currentDate.getTime() === today.getTime()
+      isToday: currentDate.getTime() === today.getTime(),
+      shiftInfo: getShiftInfo(currentDate),
+      isTrainingDay: !!trainingDay,
+      trainingDescription: trainingDay?.description
     });
   }
   

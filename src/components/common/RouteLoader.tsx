@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import { Suspense, type FC, type ComponentType } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import LoadingScreen from './LoadingScreen';
 
@@ -8,7 +8,7 @@ interface RouteLoaderProps {
   loadingMessage?: string;
 }
 
-const RouteLoader: React.FC<RouteLoaderProps> = ({
+const RouteLoader: FC<RouteLoaderProps> = ({
   children,
   requireAuth = false,
   loadingMessage = 'Loading...'
@@ -17,30 +17,42 @@ const RouteLoader: React.FC<RouteLoaderProps> = ({
 
   // Show loading screen while checking authentication
   if (requireAuth && !isAuthenticated) {
-    return <LoadingScreen message="Checking authentication..." />;
+    return (
+      <LoadingScreen 
+        message="Checking authentication..." 
+        aria-label="Verifying user authentication"
+      />
+    );
   }
 
   return (
-    <Suspense fallback={<LoadingScreen message={loadingMessage} />}>
+    <Suspense 
+      fallback={
+        <LoadingScreen 
+          message={loadingMessage}
+          aria-label={`Loading ${loadingMessage.toLowerCase()}`}
+        />
+      }
+    >
       {children}
     </Suspense>
   );
 };
 
 // Higher-order component for lazy-loaded routes
-export const withRouteLoader = (
-  Component: React.ComponentType<any>,
+export const withRouteLoader = <P extends object>(
+  Component: ComponentType<P>,
   options: Omit<RouteLoaderProps, 'children'> = {}
-) => {
-  const WrappedComponent = (props: any) => (
+): FC<P> => {
+  const WrappedComponent: FC<P> = (props) => (
     <RouteLoader {...options}>
       <Component {...props} />
     </RouteLoader>
   );
 
-  WrappedComponent.displayName = `WithRouteLoader(${
-    Component.displayName || Component.name || 'Component'
-  })`;
+  // Preserve the original component's name for better debugging
+  const displayName = Component.displayName || Component.name || 'Component';
+  WrappedComponent.displayName = `WithRouteLoader(${displayName})`;
 
   return WrappedComponent;
 };

@@ -1,5 +1,6 @@
-import { useState, useCallback, ChangeEvent } from 'react';
-import { ValidationError, ValidationService } from '../services/validationService';
+import { type ChangeEvent, useState, useCallback } from 'react';
+import type { ValidationError } from '../services/validationService';
+import { formatValidationErrors } from '../services/validationService';
 import { notificationService } from '../services/notificationService';
 
 type ValidationFunction<T> = (values: Partial<T>) => ValidationError[];
@@ -10,7 +11,10 @@ interface UseFormOptions<T> {
   validate?: ValidationFunction<T>;
 }
 
-export function useForm<T extends Record<string, any>>({
+// Helper type to ensure all object values are treated as valid form field types
+type FormFieldValue = string | number | boolean | string[] | Date | null | undefined;
+
+export function useForm<T>({
   initialValues,
   onSubmit,
   validate
@@ -55,8 +59,8 @@ export function useForm<T extends Record<string, any>>({
     }
   }, [values, validate]);
 
-  const setValue = useCallback((name: keyof T, value: any) => {
-    setValues(prev => ({ ...prev, [name]: value }));
+  const setValue = useCallback((name: keyof T, value: FormFieldValue) => {
+    setValues(prev => ({ ...prev, [name]: value } as T));
     setTouched(prev => ({ ...prev, [name]: true }));
   }, []);
 
@@ -77,12 +81,12 @@ export function useForm<T extends Record<string, any>>({
         
         // Mark all fields as touched
         const newTouched: Record<string, boolean> = {};
-        Object.keys(values).forEach(key => {
+        Object.keys(values as Record<string, unknown>).forEach(key => {
           newTouched[key] = true;
         });
         setTouched(newTouched);
 
-        notificationService.error(ValidationService.formatValidationErrors(validationErrors));
+        notificationService.error(formatValidationErrors(validationErrors));
         return;
       }
     }

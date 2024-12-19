@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useForm } from '../hooks/useForm';
 import { useAuth } from '../hooks/useAuth';
+import { useAuthNavigation } from '../hooks/useAuthNavigation';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import Card from '../components/common/Card';
@@ -10,8 +10,8 @@ import { notificationService } from '../services/notificationService';
 import type { LoginCredentials } from '../services/authService';
 
 const LoginView = () => {
-  const navigate = useNavigate();
   const { login } = useAuth();
+  const { navigateAfterLogin } = useAuthNavigation();
   const [isLoading, setIsLoading] = useState(false);
 
   const { values, handleChange, handleSubmit } = useForm<LoginCredentials>({
@@ -22,9 +22,9 @@ const LoginView = () => {
     onSubmit: async (data) => {
       setIsLoading(true);
       try {
-        await login(data);
+        await login(data.username, data.password);
         notificationService.success('Login successful');
-        navigate('/officers');
+        navigateAfterLogin();
       } catch (error) {
         if (error instanceof Error) {
           notificationService.error(error.message);
@@ -52,7 +52,9 @@ const LoginView = () => {
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
+                aria-label="NCCPD Shield Logo"
               >
+                <title>NCCPD Shield</title>
                 <path 
                   strokeLinecap="round" 
                   strokeLinejoin="round" 
@@ -82,7 +84,14 @@ const LoginView = () => {
               autoComplete="username"
               className="form-input"
               leftIcon={
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg 
+                  className="w-5 h-5 text-gray-400" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  role="img"
+                >
+                  <title>Username Icon</title>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               }
@@ -98,7 +107,14 @@ const LoginView = () => {
               autoComplete="current-password"
               className="form-input"
               leftIcon={
-                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg 
+                  className="w-5 h-5 text-gray-400" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  role="img"
+                >
+                  <title>Password Icon</title>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               }

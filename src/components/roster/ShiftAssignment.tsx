@@ -7,6 +7,10 @@ interface ShiftAssignmentProps {
   onAssignmentUpdate: () => void;
 }
 
+const getOfficerDisplayName = (officer: Roster['officers'][0]): string => {
+  return `${officer.firstName} ${officer.lastName}`;
+};
+
 const ShiftAssignmentComponent = ({ roster, onAssignmentUpdate }: ShiftAssignmentProps) => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedShift, setSelectedShift] = useState('');
@@ -51,6 +55,13 @@ const ShiftAssignmentComponent = ({ roster, onAssignmentUpdate }: ShiftAssignmen
 
     if (existingAssignment) {
       setErrorMessage('Officer is already assigned to a shift on this date');
+      return;
+    }
+
+    // Check if officer is on leave or inactive
+    const officer = roster.officers.find(o => o.id === selectedOfficer);
+    if (officer && (officer.status === 'leave' || officer.status === 'inactive')) {
+      setErrorMessage(`Cannot assign officer who is ${officer.status}`);
       return;
     }
 
@@ -120,12 +131,21 @@ const ShiftAssignmentComponent = ({ roster, onAssignmentUpdate }: ShiftAssignmen
     });
   };
 
-  const getOfficerName = (officerId: string) => {
-    return roster.officers.find(o => o.id === officerId)?.name || 'Unknown Officer';
+  const getOfficerById = (officerId: string) => {
+    return roster.officers.find(o => o.id === officerId);
   };
 
   const getShiftName = (shiftId: string) => {
     return roster.shifts.find(s => s.id === shiftId)?.name || 'Unknown Shift';
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'text-green-600';
+      case 'leave': return 'text-amber-600';
+      case 'training': return 'text-blue-600';
+      default: return 'text-red-600';
+    }
   };
 
   return (
@@ -193,10 +213,12 @@ const ShiftAssignmentComponent = ({ roster, onAssignmentUpdate }: ShiftAssignmen
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             >
               <option value="">Select Officer</option>
-              {roster.officers.map((officer) => (
-                <option key={officer.id} value={officer.id}>
-                  {officer.name} ({officer.badgeNumber})
-                </option>
+              {roster.officers
+                .filter(officer => officer.status === 'active' || officer.status === 'training')
+                .map((officer) => (
+                  <option key={officer.id} value={officer.id}>
+                    {getOfficerDisplayName(officer)} ({officer.badgeNumber})
+                  </option>
               ))}
             </select>
           </div>
@@ -246,25 +268,39 @@ const ShiftAssignmentComponent = ({ roster, onAssignmentUpdate }: ShiftAssignmen
                 <div key={date} className="border rounded-lg p-4">
                   <h4 className="font-semibold text-gray-700 mb-2">{formatDate(date)}</h4>
                   <div className="space-y-2">
-                    {dateAssignments.map((assignment, index) => (
-                      <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded">
-                        <div>
-                          <span className="font-medium">{getOfficerName(assignment.officerId)}</span>
-                          <span className="text-gray-600 mx-2">→</span>
-                          <span>{getShiftName(assignment.shiftId)}</span>
-                          <span className="text-gray-600 ml-2">({assignment.position})</span>
+                    {dateAssignments.map((assignment, index) => {
+                      const officer = getOfficerById(assignment.officerId);
+                      if (!officer) return null;
+
+                      return (
+                        <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded">
+                          <div>
+                            <span className="font-medium">{getOfficerDisplayName(officer)}</span>
+                            {officer.specialAssignment && (
+                              <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">
+                                {officer.specialAssignment}
+                              </span>
+                            )}
+                            <span className="text-gray-600 mx-2">→</span>
+                            <span>{getShiftName(assignment.shiftId)}</span>
+                            <span className="text-gray-600 ml-2">({assignment.position})</span>
+                            <span className={`ml-2 text-sm ${getStatusColor(officer.status)}`}>
+                              ({officer.status})
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => removeAssignment(assignment.date, assignment.officerId)}
+                            className="text-red-600 hover:text-red-800"
+                            aria-label="Remove Assignment"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-labelledby="remove-assignment-title">
+                              <title id="remove-assignment-title">Remove Assignment</title>
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
                         </div>
-                        <button
-                          onClick={() => removeAssignment(assignment.date, assignment.officerId)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-labelledby="removeIcon">
-                            <title id="removeIcon">Remove Assignment</title>
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               );

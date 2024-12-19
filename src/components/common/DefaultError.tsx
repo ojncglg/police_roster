@@ -5,15 +5,18 @@ const DefaultError = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center px-4 transition-colors duration-200">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900 p-8 text-center">
         <div className="mb-6">
           <svg
             className="mx-auto h-16 w-16 text-police-yellow"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
+            role="img"
           >
+            <title>Error icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -22,22 +25,24 @@ const DefaultError = () => {
             />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           Oops! Something went wrong
         </h2>
-        <p className="text-gray-600 mb-8">
+        <p className="text-gray-600 dark:text-gray-400 mb-8">
           We apologize for the inconvenience. Please try again or contact support if the problem persists.
         </p>
         <div className="space-x-4">
           <Button
             onClick={() => navigate(-1)}
             variant="outline"
+            aria-label="Go back to previous page"
           >
             Go Back
           </Button>
           <Button
             onClick={() => navigate('/')}
-            className="bg-police-yellow text-black hover:bg-police-gold"
+            variant="primary"
+            aria-label="Go to home page"
           >
             Go Home
           </Button>

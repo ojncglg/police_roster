@@ -1,3 +1,36 @@
+export interface Officer {
+  id: string;
+  firstName: string;
+  lastName: string;
+  badgeNumber: string;
+  rank: string;
+  zone: string;
+  sector: string;
+  specialAssignment?: string;
+  email?: string;
+  phone?: string;
+  status: 'active' | 'inactive' | 'leave' | 'training';
+  notes?: string;
+  specialAssignments: string[];
+  isActive: boolean;
+}
+
+export interface OfficerFormData {
+  firstName: string;
+  lastName: string;
+  badgeNumber: string;
+  rank: string;
+  zone: string;
+  sector: string;
+  specialAssignment: string;  // Changed from optional to required with empty string default
+  email: string;              // Changed from optional to required with empty string default
+  phone: string;              // Changed from optional to required with empty string default
+  status: 'active' | 'inactive' | 'leave' | 'training';
+  notes: string;              // Changed from optional to required with empty string default
+  specialAssignments: string[];
+  isActive: boolean;
+}
+
 export interface Zone {
   id: string;
   name: string;
@@ -9,71 +42,57 @@ export interface Sector {
   zoneId: string;
 }
 
-export interface SpecialAssignment {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-export interface Officer {
-  id: string;
-  badgeNumber: string;
-  firstName: string;
-  lastName: string;
-  rank: string;
-  email?: string;
-  phone?: string;
-  zoneId: string;
-  sectorId: string;
-  specialAssignments: string[]; // Array of SpecialAssignment IDs
-  status: 'active' | 'inactive' | 'leave' | 'training';
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export const RANKS = [
-  'Officer',
-  'Senior Officer',
-  'Corporal',
-  'Sergeant',
-  'Lieutenant',
-  'Captain',
-  'Major',
-  'Deputy Chief',
   'Chief',
+  'Deputy Chief',
+  'Captain',
+  'Lieutenant',
+  'Sergeant',
+  'Corporal',
+  'Officer'
 ] as const;
 
-export type Rank = typeof RANKS[number];
-
-// Initial data for zones and sectors
 export const ZONES: Zone[] = [
-  { id: 'z1', name: 'Zone 1' },
-  { id: 'z2', name: 'Zone 2' },
-  { id: 'z3', name: 'Zone 3' },
-  { id: 'z4', name: 'Zone 4' },
+  { id: 'north', name: 'North' },
+  { id: 'south', name: 'South' },
+  { id: 'east', name: 'East' },
+  { id: 'west', name: 'West' },
+  { id: 'central', name: 'Central' }
 ];
 
 export const SECTORS: Sector[] = [
-  { id: 's1', name: 'Sector 1', zoneId: 'z1' },
-  { id: 's2', name: 'Sector 2', zoneId: 'z1' },
-  { id: 's3', name: 'Sector 3', zoneId: 'z2' },
-  { id: 's4', name: 'Sector 4', zoneId: 'z2' },
-  { id: 's5', name: 'Sector 5', zoneId: 'z3' },
-  { id: 's6', name: 'Sector 6', zoneId: 'z3' },
-  { id: 's7', name: 'Sector 7', zoneId: 'z4' },
-  { id: 's8', name: 'Sector 8', zoneId: 'z4' },
+  { id: 'sector1', name: 'Sector 1', zoneId: 'north' },
+  { id: 'sector2', name: 'Sector 2', zoneId: 'north' },
+  { id: 'sector3', name: 'Sector 3', zoneId: 'south' },
+  { id: 'sector4', name: 'Sector 4', zoneId: 'south' },
+  { id: 'sector5', name: 'Sector 5', zoneId: 'central' },
+  { id: 'sector6', name: 'Sector 6', zoneId: 'central' }
 ];
+
+export interface SpecialAssignment {
+  id: string;
+  name: string;
+}
 
 export const SPECIAL_ASSIGNMENTS: SpecialAssignment[] = [
-  { id: 'sa1', name: 'K-9 Unit', description: 'Canine handling and support' },
-  { id: 'sa2', name: 'SWAT', description: 'Special Weapons and Tactics' },
-  { id: 'sa3', name: 'Traffic', description: 'Traffic enforcement and accident investigation' },
-  { id: 'sa4', name: 'Detective', description: 'Criminal investigations' },
-  { id: 'sa5', name: 'Training', description: 'Officer training and development' },
-  { id: 'sa6', name: 'Community Relations', description: 'Community outreach and public relations' },
+  { id: 'k9', name: 'K9 Unit' },
+  { id: 'swat', name: 'SWAT' },
+  { id: 'detective', name: 'Detective' },
+  { id: 'traffic', name: 'Traffic' },
+  { id: 'community', name: 'Community Relations' },
+  { id: 'training', name: 'Training Officer' }
 ];
 
-export interface OfficerFormData extends Omit<Officer, 'id' | 'createdAt' | 'updatedAt'> {
-  id?: string;
-}
+export const SPECIAL_TEAMS = {
+  SWAT: 'Special Weapons and Tactics',
+  CNT: 'Crisis Negotiation Team',
+  CIT: 'Crisis Intervention Team',
+  CISM: 'Critical Incident Stress Management',
+  MFF: 'Mobile Field Force',
+  VRT: 'Veteran Response Team',
+  EDS: 'Evidence Detection Specialist',
+  EOD: 'Explosive Ordnance Disposal',
+  PCS: 'Police Communications Specialist'
+} as const;
+
+export type SpecialTeam = keyof typeof SPECIAL_TEAMS;

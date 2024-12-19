@@ -1,6 +1,6 @@
 interface LoadingSpinnerProps {
   size?: 'small' | 'medium' | 'large';
-  color?: 'primary' | 'white';
+  color?: 'primary' | 'white' | 'police-yellow';
   className?: string;
 }
 
@@ -17,17 +17,20 @@ const LoadingSpinner = ({
 
   const colorClasses = {
     primary: 'text-blue-600',
-    white: 'text-white'
+    white: 'text-white',
+    'police-yellow': 'text-police-yellow'
   };
 
   return (
-    <div className={`flex justify-center items-center ${className}`}>
+    <div className={`flex justify-center items-center ${className}`} role="status">
       <svg
         className={`animate-spin ${sizeClasses[size]} ${colorClasses[color]}`}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
+        role="img"
       >
+        <title>Loading spinner</title>
         <circle
           className="opacity-25"
           cx="12"
@@ -42,16 +45,17 @@ const LoadingSpinner = ({
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
         />
       </svg>
+      <span className="sr-only">Loading...</span>
     </div>
   );
 };
 
 export const LoadingOverlay = ({ message = 'Loading...' }) => {
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-8 flex flex-col items-center">
-        <LoadingSpinner size="large" />
-        <p className="mt-4 text-gray-700 font-medium">{message}</p>
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-8 flex flex-col items-center">
+        <LoadingSpinner size="large" color="police-yellow" />
+        <p className="mt-4 text-gray-700 dark:text-gray-300 font-medium">{message}</p>
       </div>
     </div>
   );
@@ -72,8 +76,8 @@ export const LoadingContainer = ({
     return (
       <div className={`flex justify-center items-center p-8 ${className}`}>
         <div className="text-center">
-          <LoadingSpinner size="large" />
-          <p className="mt-4 text-gray-600">{message}</p>
+          <LoadingSpinner size="large" color="police-yellow" />
+          <p className="mt-4 text-gray-600 dark:text-gray-400">{message}</p>
         </div>
       </div>
     );
