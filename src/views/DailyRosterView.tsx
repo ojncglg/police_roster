@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import DailyRosterComponent from '../components/roster/DailyRosterView';
 import type { DailyRosterProps } from '../types/dailyRoster';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import Loading from '../components/common/Loading';
 
 const DailyRosterView = () => {
   const [searchParams] = useSearchParams();
@@ -409,7 +409,7 @@ const DailyRosterView = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-full">
-        <LoadingSpinner />
+        <Loading variant="spinner" />
       </div>
     );
   }

@@ -1,5 +1,6 @@
 import type { Shift, ShiftAssignment, Roster } from '../types/roster';
 import type { Officer } from '../types/officer';
+import { isCommandRank } from '../types/officer';
 
 export interface ValidationError {
   field: string;
@@ -120,8 +121,17 @@ export const validateOfficer = (officer: Partial<Officer>): ValidationError[] =>
       field: 'status',
       validate: validateRequired,
       message: 'Status is required',
-    },
+    }
   ];
+
+  // Add desk validation for command ranks
+  if (officer.rank && isCommandRank(officer.rank)) {
+    rules.push({
+      field: 'isOnDesk',
+      validate: validateRequired,
+      message: 'Desk duty assignment is required for command ranks',
+    });
+  }
 
   return validateRules(officer, rules);
 };
@@ -220,8 +230,9 @@ export const validateShiftAssignment = (
   if (assignment.officerId && assignment.shiftId) {
     // Officer availability check
     const officer = roster.officers.find(o => o.id === assignment.officerId);
-    if (officer?.status === 'leave' || officer?.status === 'inactive') {
-      errors.push(createError('officerId', `Cannot assign officer who is ${officer.status}`));
+    if (officer?.status === 'deployed' || officer?.status === 'fmla' || officer?.status === 'tdy' || 
+        officer?.status === 'retired' || officer?.status === 'adminLeave') {
+      errors.push(createError('officerId', `Cannot assign officer who is ${officer.status === 'adminLeave' ? 'on Admin Leave' : officer.status.toUpperCase()}`));
     }
 
     // Date range check

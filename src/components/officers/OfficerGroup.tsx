@@ -1,4 +1,5 @@
 import type { Officer } from '../../types/officer';
+import { isCommandRank } from '../../types/officer';
 import Card from '../common/Card';
 
 interface OfficerGroupProps {
@@ -21,7 +22,11 @@ const OfficerGroup = ({ title, officers, onEdit }: OfficerGroupProps) => {
                   <span className="text-gray-500 ml-2">({officer.badgeNumber})</span>
                   <span className="text-gray-600 dark:text-gray-400 ml-2">- {officer.rank}</span>
                   <span className="text-gray-600 dark:text-gray-400 ml-2">Zone {officer.zone}</span>
-                  <span className="text-gray-600 dark:text-gray-400 ml-2">{officer.sector}</span>
+                  <span className="text-gray-600 dark:text-gray-400 ml-2">
+                    {isCommandRank(officer.rank) ? 
+                      (officer.isOnDesk ? 'On Desk' : 'On Patrol') : 
+                      `Sector ${officer.sector}`}
+                  </span>
                   {officer.specialAssignment && (
                     <span className="text-blue-600 dark:text-blue-400 ml-2">- {officer.specialAssignment}</span>
                   )}

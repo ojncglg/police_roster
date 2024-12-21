@@ -1,46 +1,22 @@
-import { initializeOfficers } from './officers';
 import { officers } from './officers';
 import { initialRoster } from './rosters';
-import { rosterService } from '../services/rosterService';
-import { officerService } from '../services/officerService';
+import type { Roster } from '../types/roster';
 
 export function initializeData(): void {
-  // Initialize officers
-  initializeOfficers();
-  
-  // Create officers in the service
-  officers.forEach(async (officer) => {
-    try {
-      await officerService.createOfficer({
-        firstName: officer.firstName,
-        lastName: officer.lastName,
-        badgeNumber: officer.badgeNumber,
-        rank: officer.rank,
-        zone: officer.zone,
-        sector: officer.sector,
-        specialAssignment: officer.specialAssignment || '',
-        email: '',
-        phone: '',
-        status: officer.status,
-        notes: officer.notes || '',
-        specialAssignments: officer.specialAssignments,
-        isActive: officer.isActive
-      });
-    } catch (error) {
-      console.error(`Failed to create officer ${officer.badgeNumber}:`, error);
-    }
-  });
+  const officerServiceKey = 'nccpd_officers';
+  const rosterServiceKey = 'nccpd_rosters';
 
-  // Initialize roster with the created officers
-  const rosterWithOfficers = {
-    ...initialRoster,
-    officers: officers
-  };
+  // Only initialize if data doesn't exist
+  if (!localStorage.getItem(officerServiceKey)) {
+    // Store officers in localStorage
+    localStorage.setItem(officerServiceKey, JSON.stringify(officers));
 
-  // Create the roster in the service
-  try {
-    rosterService.createRoster(rosterWithOfficers);
-  } catch (error) {
-    console.error('Failed to create roster:', error);
+    // Initialize roster with the officers
+    const roster: Roster = {
+      ...initialRoster,
+      id: Date.now().toString(),
+      officers: officers
+    };
+    localStorage.setItem(rosterServiceKey, JSON.stringify([roster]));
   }
 }

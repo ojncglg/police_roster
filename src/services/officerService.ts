@@ -9,17 +9,48 @@ interface OfficerServiceInterface {
   validateOfficerData(data: OfficerFormData): string[];
   getOfficersByDistrict(district: string): Officer[];
   getCommandStaff(): Officer[];
+  addChangeListener(listener: OfficerChangeListener): void;
+  removeChangeListener(listener: OfficerChangeListener): void;
 }
+
+type OfficerChangeListener = () => void;
 
 class OfficerService implements OfficerServiceInterface {
   private officers: Officer[] = [];
+  private readonly storageKey = 'nccpd_officers';
+  private listeners: Set<OfficerChangeListener> = new Set();
+
+  constructor() {
+    // Load initial data from localStorage
+    const storedData = localStorage.getItem(this.storageKey);
+    if (storedData) {
+      this.officers = JSON.parse(storedData);
+    }
+  }
+
+  private saveToStorage(): void {
+    localStorage.setItem(this.storageKey, JSON.stringify(this.officers));
+    this.notifyListeners();
+  }
+
+  private notifyListeners(): void {
+    this.listeners.forEach(listener => listener());
+  }
+
+  addChangeListener(listener: OfficerChangeListener): void {
+    this.listeners.add(listener);
+  }
+
+  removeChangeListener(listener: OfficerChangeListener): void {
+    this.listeners.delete(listener);
+  }
 
   getOfficers(): Officer[] {
-    return this.officers;
+    return [...this.officers]; // Return a copy to prevent direct mutations
   }
 
   getAllOfficers(): Officer[] {
-    return this.officers;
+    return [...this.officers]; // Return a copy to prevent direct mutations
   }
 
   async createOfficer(data: OfficerFormData): Promise<Officer> {
@@ -28,6 +59,7 @@ class OfficerService implements OfficerServiceInterface {
       ...data
     };
     this.officers.push(newOfficer);
+    this.saveToStorage();
     return newOfficer;
   }
 
@@ -43,6 +75,7 @@ class OfficerService implements OfficerServiceInterface {
       id // Ensure id is preserved
     };
     this.officers[index] = updatedOfficer;
+    this.saveToStorage();
     return updatedOfficer;
   }
 
@@ -52,6 +85,7 @@ class OfficerService implements OfficerServiceInterface {
       throw new Error('Officer not found');
     }
     this.officers.splice(index, 1);
+    this.saveToStorage();
   }
 
   validateOfficerData(data: OfficerFormData): string[] {

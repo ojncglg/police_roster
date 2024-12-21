@@ -17,8 +17,9 @@ const getOfficerDisplayName = (officer: Officer): string => {
 const getStatusColor = (status: Officer['status']): string => {
   switch (status) {
     case 'active': return 'text-green-600';
-    case 'leave': return 'text-amber-600';
-    case 'training': return 'text-blue-600';
+    case 'deployed': return 'text-amber-600';
+    case 'fmla': return 'text-blue-600';
+    case 'tdy': return 'text-purple-600';
     default: return 'text-red-600';
   }
 };
@@ -112,13 +113,13 @@ const PrintableCalendar = ({ roster, month, onClose }: PrintableCalendarProps) =
                   Active: {roster.officers.filter(o => o.status === 'active').length}
                 </div>
                 <div className="text-sm text-amber-600">
-                  On Leave: {roster.officers.filter(o => o.status === 'leave').length}
+                  Deployed: {roster.officers.filter(o => o.status === 'deployed').length}
                 </div>
                 <div className="text-sm text-blue-600">
-                  In Training: {roster.officers.filter(o => o.status === 'training').length}
+                  FMLA: {roster.officers.filter(o => o.status === 'fmla').length}
                 </div>
-                <div className="text-sm text-red-600">
-                  Inactive: {roster.officers.filter(o => o.status === 'inactive').length}
+                <div className="text-sm text-purple-600">
+                  TDY: {roster.officers.filter(o => o.status === 'tdy').length}
                 </div>
               </div>
             </div>

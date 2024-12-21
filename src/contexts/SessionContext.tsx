@@ -1,3 +1,9 @@
+/**
+ * @file SessionContext.tsx
+ * @description Provides session management and authentication context for the application.
+ * Includes route protection, authentication state management, and navigation utilities.
+ */
+
 import { createContext, useContext, useEffect, type ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSession } from '../hooks/useSession';
@@ -5,6 +11,10 @@ import LoadingScreen from '../components/common/LoadingScreen';
 
 import type { User } from '../services/authService';
 
+/**
+ * Session Context Type Definition
+ * Defines the shape of the session context data and methods
+ */
 interface SessionContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -15,13 +25,23 @@ interface SessionContextType {
   updateActivity: () => void;
 }
 
+// Create context with null as initial value
 const SessionContext = createContext<SessionContextType | null>(null);
 
-// Protected routes configuration
+/**
+ * Route Configuration
+ * Defines which routes are public vs protected
+ */
 const PUBLIC_ROUTES = ['/login', '/forgot-password', '/reset-password'];
 const DEFAULT_PRIVATE_ROUTE = '/officers';
 const DEFAULT_PUBLIC_ROUTE = '/login';
 
+/**
+ * SessionProvider Component
+ * Provides session context to the application
+ * 
+ * @param children - Child components that will have access to session context
+ */
 export function SessionProvider({ children }: { children: ReactNode }) {
   const session = useSession();
   return (
@@ -31,6 +51,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * useSessionContext Hook
+ * Custom hook to access session context
+ * 
+ * @throws Error if used outside of SessionProvider
+ * @returns SessionContextType object containing session state and methods
+ */
 export function useSessionContext() {
   const context = useContext(SessionContext);
   if (!context) {
@@ -39,7 +66,13 @@ export function useSessionContext() {
   return context;
 }
 
-// HOC for protecting routes
+/**
+ * withAuth Higher Order Component
+ * Wraps components that require authentication
+ * 
+ * @param WrappedComponent - Component to be protected
+ * @returns Protected component with authentication check
+ */
 export function withAuth<P extends object>(
   WrappedComponent: React.ComponentType<P>
 ) {
@@ -48,6 +81,7 @@ export function withAuth<P extends object>(
     const location = useLocation();
     const navigate = useNavigate();
 
+    // Redirect to login if not authenticated
     useEffect(() => {
       if (!isLoading && !isAuthenticated && !PUBLIC_ROUTES.includes(location.pathname)) {
         navigate(DEFAULT_PUBLIC_ROUTE, {
@@ -69,7 +103,12 @@ export function withAuth<P extends object>(
   };
 }
 
-// Hook for preventing authenticated users from accessing public routes
+/**
+ * usePreventAuthAccess Hook
+ * Prevents authenticated users from accessing public routes
+ * 
+ * @returns Object containing authentication state
+ */
 export function usePreventAuthAccess() {
   const { isAuthenticated, isLoading } = useSessionContext();
   const navigate = useNavigate();
@@ -84,7 +123,12 @@ export function usePreventAuthAccess() {
   return { isAuthenticated, isLoading };
 }
 
-// Hook for requiring authentication
+/**
+ * useRequireAuth Hook
+ * Enforces authentication requirement for protected routes
+ * 
+ * @returns Object containing authentication state
+ */
 export function useRequireAuth() {
   const { isAuthenticated, isLoading } = useSessionContext();
   const location = useLocation();
@@ -102,7 +146,12 @@ export function useRequireAuth() {
   return { isAuthenticated, isLoading };
 }
 
-// Hook for handling authentication state in forms
+/**
+ * useAuthForm Hook
+ * Handles authentication logic in login forms
+ * 
+ * @returns Object containing login handler
+ */
 export function useAuthForm() {
   const { login } = useSessionContext();
   const location = useLocation();
@@ -111,7 +160,7 @@ export function useAuthForm() {
   const handleLogin = async (username: string, password: string) => {
     await login(username, password);
     
-    // Get the return path from location state, or use default
+    // Navigate to return URL or default private route
     const from = location.state?.from as string || DEFAULT_PRIVATE_ROUTE;
     navigate(from, { replace: true });
   };
@@ -119,7 +168,13 @@ export function useAuthForm() {
   return { handleLogin };
 }
 
-// Utility function to get return URL
+/**
+ * getReturnUrl Utility Function
+ * Gets the URL to return to after authentication
+ * 
+ * @param location - Location object containing return path
+ * @returns Return URL string
+ */
 export function getReturnUrl(location: { state?: { from?: string } }): string {
   return location.state?.from || DEFAULT_PRIVATE_ROUTE;
 }

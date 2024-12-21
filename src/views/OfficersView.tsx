@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { withAuth } from '../hocs/withAuth';
 import OfficerList from '../components/officers/OfficerList';
 import OfficerForm from '../components/officers/OfficerForm';
@@ -7,39 +7,29 @@ import { CardHeader } from '../components/common/Card';
 import Modal from '../components/common/Modal';
 import Button from '../components/common/Button';
 import { useAuth } from '../hooks/useAuth';
-import { officerService } from '../services/officerService';
+import { useOfficers } from '../hooks/useOfficers';
 import { notificationService } from '../services/notificationService';
-import type { Officer } from '../types/officer';
+import type { Officer, OfficerFormData } from '../types/officer';
 
 const OfficersView = () => {
   const { user } = useAuth();
-  const [officers, setOfficers] = useState<Officer[]>([]);
+  const { officers, loading, error, updateOfficer, deleteOfficer, createOfficer } = useOfficers();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
 
-  useEffect(() => {
-    loadOfficers();
-  }, []);
-
-  const loadOfficers = async () => {
-    try {
-      const data = await officerService.getAllOfficers();
-      setOfficers(data);
-    } catch (error) {
-      notificationService.error('Failed to load officers');
-    }
-  };
+  if (error) {
+    notificationService.error('Failed to load officers');
+  }
 
   const handleEdit = (officer: Officer) => {
     setSelectedOfficer(officer);
     setIsEditModalOpen(true);
   };
 
-  const handleDelete = (officer: Officer) => {
+  const handleDelete = async (officer: Officer) => {
     try {
-      officerService.deleteOfficer(officer.id);
-      setOfficers(prev => prev.filter(o => o.id !== officer.id));
+      await deleteOfficer(officer.id);
       notificationService.success('Officer deleted successfully');
     } catch (error) {
       notificationService.error('Failed to delete officer');
@@ -50,18 +40,42 @@ const OfficersView = () => {
     setIsAddModalOpen(true);
   };
 
-  const handleFormSubmit = (updatedOfficer: Officer) => {
-    if (selectedOfficer) {
-      // Editing existing officer
-      setOfficers(prev => prev.map(o => o.id === updatedOfficer.id ? updatedOfficer : o));
-      setIsEditModalOpen(false);
-      setSelectedOfficer(null);
-    } else {
-      // Adding new officer
-      setOfficers(prev => [...prev, updatedOfficer]);
-      setIsAddModalOpen(false);
+  const handleFormSubmit = async (formData: OfficerFormData) => {
+    try {
+      if (selectedOfficer) {
+        // Editing existing officer
+        await updateOfficer(selectedOfficer.id, formData);
+        setIsEditModalOpen(false);
+        setSelectedOfficer(null);
+        notificationService.success('Officer updated successfully');
+      } else {
+        // Adding new officer
+        await createOfficer(formData);
+        setIsAddModalOpen(false);
+        notificationService.success('Officer created successfully');
+      }
+    } catch (error) {
+      notificationService.error('Failed to save officer');
     }
   };
+
+  // Convert Officer to OfficerFormData for the form
+  const getFormData = (officer: Officer): OfficerFormData => ({
+    firstName: officer.firstName,
+    lastName: officer.lastName,
+    badgeNumber: officer.badgeNumber,
+    rank: officer.rank,
+    zone: officer.zone,
+    sector: officer.sector,
+    isOnDesk: officer.isOnDesk,
+    specialAssignment: officer.specialAssignment || '',
+    email: officer.email || '',
+    phone: officer.phone || '',
+    status: officer.status,
+    notes: officer.notes || '',
+    specialAssignments: officer.specialAssignments,
+    isActive: officer.isActive
+  });
 
   const handleFormCancel = () => {
     setIsEditModalOpen(false);
@@ -205,7 +219,7 @@ const OfficersView = () => {
       >
         {selectedOfficer && (
           <OfficerForm
-            officer={selectedOfficer}
+            initialData={selectedOfficer ? getFormData(selectedOfficer) : undefined}
             onSubmit={handleFormSubmit}
             onCancel={handleFormCancel}
           />

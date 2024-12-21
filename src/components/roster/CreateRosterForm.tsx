@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Officer } from '../../types/officer';
 import type { Shift } from '../../types/roster';
-import { RANKS, SPECIAL_TEAMS } from '../../types/officer';
+import { RANKS, SPECIAL_TEAMS, isCommandRank } from '../../types/officer';
 import { rosterService } from '../../services/rosterService';
 
-type OfficerStatus = 'active' | 'inactive' | 'leave' | 'training';
+type OfficerStatus = 'active' | 'deployed' | 'fmla' | 'tdy';
 
 interface NewOfficer extends Omit<Officer, 'id' | 'status'> {
   status: OfficerStatus;
@@ -29,6 +29,7 @@ const CreateRosterForm = () => {
     rank: '',
     zone: '',
     sector: '',
+    isOnDesk: false,
     specialAssignment: '',
     email: '',
     phone: '',
@@ -45,15 +46,25 @@ const CreateRosterForm = () => {
     endTime: ''
   });
 
+  // Reset isOnDesk when rank changes
+  useEffect(() => {
+    if (!isCommandRank(newOfficer.rank)) {
+      setNewOfficer(prev => ({ ...prev, isOnDesk: false }));
+    }
+  }, [newOfficer.rank]);
+
   const handleAddOfficer = () => {
     if (newOfficer.badgeNumber && newOfficer.firstName && newOfficer.lastName) {
-      setOfficers([
-        ...officers,
-        {
-          id: Date.now().toString(),
-          ...newOfficer
-        }
-      ]);
+      // Ensure isOnDesk is set based on the rank
+      const officerToAdd = {
+        id: Date.now().toString(),
+        ...newOfficer,
+        isOnDesk: isCommandRank(newOfficer.rank) ? newOfficer.isOnDesk : false,
+      };
+      
+      setOfficers([...officers, officerToAdd]);
+      
+      // Reset form
       setNewOfficer({
         firstName: '',
         lastName: '',
@@ -61,6 +72,7 @@ const CreateRosterForm = () => {
         rank: '',
         zone: '',
         sector: '',
+        isOnDesk: false,
         specialAssignment: '',
         email: '',
         phone: '',
@@ -114,8 +126,8 @@ const CreateRosterForm = () => {
         endDate,
         officers,
         shifts,
-      assignments: [],
-      trainingDays: []
+        assignments: [],
+        trainingDays: []
       });
 
       // Show success message
@@ -277,6 +289,19 @@ const CreateRosterForm = () => {
                     ))}
                   </select>
                 </div>
+                {isCommandRank(newOfficer.rank) && (
+                  <div>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={newOfficer.isOnDesk}
+                        onChange={(e) => setNewOfficer({...newOfficer, isOnDesk: e.target.checked})}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">Assigned to Desk Duty</span>
+                    </label>
+                  </div>
+                )}
                 <div>
                   <label className="block text-gray-700 text-sm font-bold mb-2">
                     Status
@@ -287,9 +312,9 @@ const CreateRosterForm = () => {
                     className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   >
                     <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="leave">On Leave</option>
-                    <option value="training">In Training</option>
+                    <option value="deployed">Deployed</option>
+                    <option value="fmla">FMLA</option>
+                    <option value="tdy">TDY</option>
                   </select>
                 </div>
               </div>
@@ -319,6 +344,11 @@ const CreateRosterForm = () => {
                 <div>
                   <span className="font-bold">{officer.badgeNumber}</span> - {officer.firstName} {officer.lastName}
                   <span className="ml-2 text-gray-600">({officer.rank})</span>
+                  {isCommandRank(officer.rank) && (
+                    <span className="ml-2 text-gray-600">
+                      {officer.isOnDesk ? '- On Desk' : '- On Patrol'}
+                    </span>
+                  )}
                   {officer.specialAssignment && (
                     <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">
                       {SPECIAL_TEAMS[officer.specialAssignment as keyof typeof SPECIAL_TEAMS] || officer.specialAssignment}
@@ -327,8 +357,9 @@ const CreateRosterForm = () => {
                 </div>
                 <span className={`text-sm ${
                   officer.status === 'active' ? 'text-green-600' :
-                  officer.status === 'leave' ? 'text-amber-600' :
-                  officer.status === 'training' ? 'text-blue-600' :
+                  officer.status === 'deployed' ? 'text-amber-600' :
+                  officer.status === 'fmla' ? 'text-blue-600' :
+                  officer.status === 'tdy' ? 'text-purple-600' :
                   'text-red-600'
                 }`}>
                   {officer.status}

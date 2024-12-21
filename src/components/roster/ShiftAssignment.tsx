@@ -60,8 +60,8 @@ const ShiftAssignmentComponent = ({ roster, onAssignmentUpdate }: ShiftAssignmen
 
     // Check if officer is on leave or inactive
     const officer = roster.officers.find(o => o.id === selectedOfficer);
-    if (officer && (officer.status === 'leave' || officer.status === 'inactive')) {
-      setErrorMessage(`Cannot assign officer who is ${officer.status}`);
+    if (officer && (officer.status === 'deployed' || officer.status === 'fmla' || officer.status === 'tdy')) {
+      setErrorMessage(`Cannot assign officer who is ${officer.status.toUpperCase()}`);
       return;
     }
 
@@ -142,8 +142,9 @@ const ShiftAssignmentComponent = ({ roster, onAssignmentUpdate }: ShiftAssignmen
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'text-green-600';
-      case 'leave': return 'text-amber-600';
-      case 'training': return 'text-blue-600';
+      case 'deployed': return 'text-amber-600';
+      case 'fmla': return 'text-blue-600';
+      case 'tdy': return 'text-purple-600';
       default: return 'text-red-600';
     }
   };
@@ -214,7 +215,7 @@ const ShiftAssignmentComponent = ({ roster, onAssignmentUpdate }: ShiftAssignmen
             >
               <option value="">Select Officer</option>
               {roster.officers
-                .filter(officer => officer.status === 'active' || officer.status === 'training')
+                .filter(officer => officer.status === 'active')
                 .map((officer) => (
                   <option key={officer.id} value={officer.id}>
                     {getOfficerDisplayName(officer)} ({officer.badgeNumber})

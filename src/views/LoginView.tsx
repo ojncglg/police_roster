@@ -1,3 +1,9 @@
+/**
+ * @file LoginView.tsx
+ * @description Login page component that handles user authentication and provides
+ * a form interface for users to sign in to the NCCPD Roster System.
+ */
+
 import { useState } from 'react';
 import { useForm } from '../hooks/useForm';
 import { useAuth } from '../hooks/useAuth';
@@ -9,23 +15,46 @@ import ThemeToggle from '../components/common/ThemeToggle';
 import { notificationService } from '../services/notificationService';
 import type { LoginCredentials } from '../services/authService';
 
+/**
+ * LoginView Component
+ * 
+ * @component
+ * @description Provides the login interface with username/password form and handles authentication.
+ * Features:
+ * - Form validation
+ * - Loading state management
+ * - Error handling with notifications
+ * - Theme toggle support
+ * - Responsive design
+ */
 const LoginView = () => {
+  // Authentication and navigation hooks
   const { login } = useAuth();
   const { navigateAfterLogin } = useAuthNavigation();
+  
+  // Loading state for form submission
   const [isLoading, setIsLoading] = useState(false);
 
+  /**
+   * Form handling with custom hook
+   * Manages form state and submission logic
+   */
   const { values, handleChange, handleSubmit } = useForm<LoginCredentials>({
+    // Initial form values
     initialValues: {
       username: '',
       password: ''
     },
+    // Form submission handler
     onSubmit: async (data) => {
       setIsLoading(true);
       try {
+        // Attempt login
         await login(data.username, data.password);
         notificationService.success('Login successful');
         navigateAfterLogin();
       } catch (error) {
+        // Handle login errors
         if (error instanceof Error) {
           notificationService.error(error.message);
         }
@@ -37,13 +66,13 @@ const LoginView = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-police-black via-gray-900 to-gray-800 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
-      {/* Theme Toggle */}
+      {/* Theme Toggle Button - positioned in top right corner */}
       <div className="absolute top-4 right-4">
         <ThemeToggle showLabel />
       </div>
 
       <div className="max-w-md w-full space-y-8">
-        {/* Logo and Title */}
+        {/* Logo and Application Title Section */}
         <div className="text-center">
           <div className="flex justify-center mb-6">
             <div className="w-24 h-24 rounded-full bg-police-yellow flex items-center justify-center shadow-highlight">
@@ -72,8 +101,10 @@ const LoginView = () => {
           </p>
         </div>
 
+        {/* Login Form Card */}
         <Card className="py-8 px-4 shadow-highlight bg-white dark:bg-gray-800">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Username Input Field */}
             <Input
               label="Username"
               name="username"
@@ -97,6 +128,7 @@ const LoginView = () => {
               }
             />
 
+            {/* Password Input Field */}
             <Input
               label="Password"
               name="password"
@@ -120,6 +152,7 @@ const LoginView = () => {
               }
             />
 
+            {/* Submit Button */}
             <div>
               <Button
                 type="submit"
@@ -131,6 +164,7 @@ const LoginView = () => {
             </div>
           </form>
 
+          {/* Development Environment Demo Credentials */}
           {import.meta.env.DEV && (
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -140,6 +174,7 @@ const LoginView = () => {
           )}
         </Card>
 
+        {/* Footer Copyright Notice */}
         <div className="text-center">
           <p className="text-sm text-gray-400">
             © {new Date().getFullYear()} NCCPD. All rights reserved.

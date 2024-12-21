@@ -1,3 +1,8 @@
+/**
+ * @file AppLayout.tsx
+ * @description Main layout component for the authenticated application interface
+ */
+
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -10,26 +15,29 @@ import SettingsPanel from '../common/SettingsPanel';
 import ShortcutsHelp from '../common/ShortcutsHelp';
 import ThemeToggle from '../common/ThemeToggle';
 
+/**
+ * AppLayout Component
+ * Provides the main application structure including navigation, header, and content area
+ */
 const AppLayout = () => {
+    // Hooks and state management
     const location = useLocation();
     const { user, logout } = useAuth();
     const [isShortcutsHelpOpen, setIsShortcutsHelpOpen] = useState(false);
     const [isSettingsPanelOpen, setIsSettingsPanelOpen] = useState(false);
 
-    // Set up keyboard shortcuts
+    // Initialize keyboard shortcuts
     useRosterShortcuts({
+        // Focus search input shortcut
         onSearch: () => {
             const searchInput = document.querySelector('[data-search-input]') as HTMLInputElement;
-            if (searchInput) {
-                searchInput.focus();
-            }
+            if (searchInput) searchInput.focus();
         },
-        onRefresh: () => {
-            window.location.reload();
-        },
+        // Page refresh shortcut
+        onRefresh: () => window.location.reload()
     });
 
-    // Don't show layout on login page
+    // Render minimal layout for login page
     if (location.pathname === '/login') {
         return (
             <ErrorBoundary>
@@ -39,6 +47,7 @@ const AppLayout = () => {
         );
     }
 
+    // Navigation configuration
     const navigationItems = [
         {
             title: 'Daily Roster',
@@ -104,26 +113,50 @@ const AppLayout = () => {
                 </svg>
             ),
         },
+        {
+            title: 'Sick Time',
+            description: 'Manage sick time records',
+            path: '/dashboard/sick-time',
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <title>Sick Time</title>
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                </svg>
+            ),
+        },
     ];
 
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
-            {/* Sidebar */}
+            {/* Sidebar Navigation */}
             <div className="w-64 bg-white dark:bg-gray-800 shadow-lg print:hidden">
                 <div className="p-4">
-                    <Link to="/dashboard" className="flex flex-col items-start mb-8">
-                        <span className="text-xl font-bold text-police-yellow">NCCPD Roster</span>
-                        <span className="text-sm font-semibold text-police-yellow mt-1">
-                            Squad {user?.squad} Management
-                        </span>
+                    {/* App Title */}
+                    <Link to="/dashboard" className="flex items-center gap-3 mb-8">
+                        <img 
+                            src="images/after_effectslogo.png" 
+                            alt="NCCPD Logo" 
+                            className="w-12 h-12 object-contain"
+                        />
+                        <div className="flex flex-col">
+                            <span className="text-xl font-bold text-police-yellow">NCCPD Roster</span>
+                            <span className="text-sm font-semibold text-police-yellow mt-1">
+                                Patrol Squad "{user?.squad}"
+                            </span>
+                        </div>
                     </Link>
 
-                    {/* Mini Calendar */}
+                    {/* Calendar Widget */}
                     <div className="mb-8">
                         <MiniCalendar />
                     </div>
 
-                    {/* Navigation */}
+                    {/* Navigation Links */}
                     <nav className="space-y-4">
                         {navigationItems.map((item, index) => (
                             <Link
@@ -144,7 +177,7 @@ const AppLayout = () => {
                 </div>
             </div>
 
-            {/* Main Content */}
+            {/* Main Content Area */}
             <div className="flex-1 flex flex-col">
                 {/* Header */}
                 <header className="bg-police-black shadow-md print:hidden">
@@ -163,7 +196,11 @@ const AppLayout = () => {
                                 <ThemeToggle size="small" />
 
                                 {/* Settings Button */}
-                                <button onClick={() => setIsSettingsPanelOpen(true)} className="text-gray-300 hover:text-police-yellow p-2 rounded-md" title="Settings">
+                                <button 
+                                    onClick={() => setIsSettingsPanelOpen(true)} 
+                                    className="text-gray-300 hover:text-police-yellow p-2 rounded-md" 
+                                    title="Settings"
+                                >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <title>Settings</title>
                                         <path
@@ -177,7 +214,11 @@ const AppLayout = () => {
                                 </button>
 
                                 {/* Shortcuts Help Button */}
-                                <button onClick={() => setIsShortcutsHelpOpen(true)} className="text-gray-300 hover:text-police-yellow p-2 rounded-md" title="Keyboard Shortcuts (Press ?)">
+                                <button 
+                                    onClick={() => setIsShortcutsHelpOpen(true)} 
+                                    className="text-gray-300 hover:text-police-yellow p-2 rounded-md" 
+                                    title="Keyboard Shortcuts (Press ?)"
+                                >
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <title>Keyboard Shortcuts</title>
                                         <path
@@ -214,7 +255,7 @@ const AppLayout = () => {
                     </div>
                 </header>
 
-                {/* Page Content */}
+                {/* Main Content */}
                 <main className="flex-1 p-8">
                     <ErrorBoundary>
                         <Outlet />
@@ -234,10 +275,7 @@ const AppLayout = () => {
 
             {/* Modals */}
             <ShortcutsHelp isOpen={isShortcutsHelpOpen} onClose={() => setIsShortcutsHelpOpen(false)} />
-
             <SettingsPanel isOpen={isSettingsPanelOpen} onClose={() => setIsSettingsPanelOpen(false)} />
-
-            {/* Notifications */}
             <NotificationContainer />
         </div>
     );

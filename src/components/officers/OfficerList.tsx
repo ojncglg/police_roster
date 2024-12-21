@@ -41,12 +41,16 @@ const OfficerList = ({ officers, onEdit, onDelete }: OfficerListProps) => {
     switch (status) {
       case 'active':
         return 'bg-green-100 text-green-800';
-      case 'inactive':
-        return 'bg-red-100 text-red-800';
-      case 'leave':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'training':
+      case 'deployed':
+        return 'bg-amber-100 text-amber-800';
+      case 'fmla':
         return 'bg-blue-100 text-blue-800';
+      case 'tdy':
+        return 'bg-purple-100 text-purple-800';
+      case 'retired':
+        return 'bg-gray-100 text-gray-800';
+      case 'adminLeave':
+        return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -62,7 +66,10 @@ const OfficerList = ({ officers, onEdit, onDelete }: OfficerListProps) => {
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Name
+                      First Name
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Last Name
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Badge Number
@@ -71,10 +78,10 @@ const OfficerList = ({ officers, onEdit, onDelete }: OfficerListProps) => {
                       Rank
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Location
+                      Status
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Status
+                      Special Assignment
                     </th>
                     <th scope="col" className="relative px-6 py-3">
                       <span className="sr-only">Actions</span>
@@ -86,7 +93,12 @@ const OfficerList = ({ officers, onEdit, onDelete }: OfficerListProps) => {
                     <tr key={officer.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          {officer.firstName} {officer.lastName}
+                          {officer.firstName}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          {officer.lastName}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -95,13 +107,13 @@ const OfficerList = ({ officers, onEdit, onDelete }: OfficerListProps) => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {officer.rank}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        Zone {officer.zone}, {officer.sector}
-                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(officer.status)}`}>
                           {officer.status}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        {officer.specialAssignments.join(', ')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button

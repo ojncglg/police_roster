@@ -1,50 +1,63 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Officer } from '../types/officer';
+import { isCommandRank } from '../types/officer';
 import { notificationService } from '../services/notificationService';
+import { officerService } from '../services/officerService';
+import Modal from '../components/common/Modal';
+import OfficerForm from '../components/officers/OfficerForm';
 
 const EditOfficersView = () => {
-  const [officers] = useState<Officer[]>([
-    {
-      id: '1',
-      firstName: 'S/LT.',
-      lastName: 'ZEISSIG',
-      badgeNumber: '#2413',
-      rank: 'Squad Commander',
-      zone: 'North',
-      sector: 'Sector 1',
-      status: 'active',
-      specialAssignments: [],
-      isActive: true
-    },
-    {
-      id: '2',
-      firstName: 'SGT.',
-      lastName: 'WEGLARZ',
-      badgeNumber: '#2577',
-      rank: 'Float Sergeant',
-      zone: 'Central',
-      sector: 'Sector 3',
-      specialAssignment: 'CNT',
-      status: 'active',
-      specialAssignments: ['CNT', 'CIT'],
-      isActive: true
-    },
-    {
-      id: '3',
-      firstName: '',
-      lastName: 'GEORTLER',
-      badgeNumber: '#2784',
-      rank: 'Data Officer',
-      zone: 'South',
-      sector: 'Sector 4',
-      status: 'active',
-      specialAssignments: [],
-      isActive: true
-    }
-  ]);
+  const [officers, setOfficers] = useState<Officer[]>([]);
 
-  const handleEdit = (selectedOfficer: Officer) => {
-    notificationService.info(`Edit functionality coming soon for ${selectedOfficer.firstName} ${selectedOfficer.lastName}`);
+  // Load officers from service on component mount
+  useEffect(() => {
+    const loadOfficers = async () => {
+      try {
+        const data = await officerService.getAllOfficers();
+        setOfficers(data);
+      } catch (error) {
+        notificationService.error('Failed to load officers');
+      }
+    };
+    loadOfficers();
+  }, []);
+
+  const [selectedOfficer, setSelectedOfficer] = useState<Officer | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleEdit = (officer: Officer) => {
+    setSelectedOfficer(officer);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdate = async (updatedOfficer: Officer) => {
+    if (!selectedOfficer) return;
+    
+    try {
+      // Convert Officer to OfficerFormData by ensuring required fields
+      const formData = {
+        ...updatedOfficer,
+        specialAssignment: updatedOfficer.specialAssignment || '',
+        email: updatedOfficer.email || '',
+        phone: updatedOfficer.phone || '',
+        notes: updatedOfficer.notes || ''
+      };
+      
+      const result = await officerService.updateOfficer(selectedOfficer.id, formData);
+      setOfficers(officers.map(o => o.id === result.id ? result : o));
+      setIsModalOpen(false);
+      setSelectedOfficer(null);
+      notificationService.success('Officer updated successfully');
+    } catch (error) {
+      if (error instanceof Error) {
+        notificationService.error(error.message);
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+    setSelectedOfficer(null);
   };
 
   return (
@@ -63,10 +76,16 @@ const EditOfficersView = () => {
                 </span>
                 <span className="text-gray-500 ml-2">({officer.badgeNumber})</span>
                 <span className="text-gray-600 dark:text-gray-400 ml-2">- {officer.rank}</span>
-                <span className="text-gray-600 dark:text-gray-400 ml-2">Zone {officer.zone}</span>
-                <span className="text-gray-600 dark:text-gray-400 ml-2">{officer.sector}</span>
-                {officer.specialAssignment && (
-                  <span className="text-blue-600 dark:text-blue-400 ml-2">- {officer.specialAssignment}</span>
+                <span className="text-gray-600 dark:text-gray-400 ml-2">{officer.zone}</span>
+                <span className="text-gray-600 dark:text-gray-400 ml-2">
+                  {isCommandRank(officer.rank) ? 
+                    (officer.isOnDesk ? 'On Desk' : 'On Patrol') : 
+                    `Sector ${officer.sector}`}
+                </span>
+                {officer.specialAssignments.length > 0 && (
+                  <span className="text-blue-600 dark:text-blue-400 ml-2">
+                    - {officer.specialAssignments.join(', ')}
+                  </span>
                 )}
               </div>
               <button 
@@ -79,6 +98,20 @@ const EditOfficersView = () => {
           </div>
         ))}
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCancel}
+        title={`Edit Officer: ${selectedOfficer?.firstName} ${selectedOfficer?.lastName}`}
+      >
+        {selectedOfficer && (
+          <OfficerForm
+            officer={selectedOfficer}
+            onSubmit={handleUpdate}
+            onCancel={handleCancel}
+          />
+        )}
+      </Modal>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Officer } from '../../types/officer';
+import { isCommandRank } from '../../types/officer';
 import { notificationService } from '../../services/notificationService';
 
 interface EditableOfficerListProps {
@@ -25,7 +26,11 @@ const EditableOfficerList: React.FC<EditableOfficerListProps> = ({ initialOffice
                 <span className="text-gray-500 ml-2">({officer.badgeNumber})</span>
                 <span className="text-gray-600 dark:text-gray-400 ml-2">- {officer.rank}</span>
                 <span className="text-gray-600 dark:text-gray-400 ml-2">Zone {officer.zone}</span>
-                <span className="text-gray-600 dark:text-gray-400 ml-2">{officer.sector}</span>
+                <span className="text-gray-600 dark:text-gray-400 ml-2">
+                  {isCommandRank(officer.rank) ? 
+                    (officer.isOnDesk ? 'On Desk' : 'On Patrol') : 
+                    `Sector ${officer.sector}`}
+                </span>
                 {officer.specialAssignment && (
                   <span className="text-blue-600 dark:text-blue-400 ml-2">- {officer.specialAssignment}</span>
                 )}
@@ -43,13 +48,54 @@ const EditableOfficerList: React.FC<EditableOfficerListProps> = ({ initialOffice
     </div>
   );
 
-  // Group officers by their sectors
-  const commandStaff = officers.filter(o => o.rank.includes('Chief') || o.rank.includes('Captain'));
-  const district1 = officers.filter(o => o.sector.includes('1'));
-  const district2 = officers.filter(o => o.sector.includes('2'));
-  const district3 = officers.filter(o => o.sector.includes('3'));
-  const district4 = officers.filter(o => o.sector.includes('4'));
-  const specialUnits = officers.filter(o => o.specialAssignment && o.specialAssignment.length > 0);
+  // Group officers by their zones and command ranks
+  // Use Set to track processed officers and avoid duplicates
+  const processedOfficers = new Set<string>();
+
+  const commandStaff = officers.filter(o => {
+    if (isCommandRank(o.rank) && !processedOfficers.has(o.id)) {
+      processedOfficers.add(o.id);
+      return true;
+    }
+    return false;
+  });
+
+  const district1 = officers.filter(o => {
+    if (!isCommandRank(o.rank) && o.zone === '1 Zone' && !processedOfficers.has(o.id)) {
+      processedOfficers.add(o.id);
+      return true;
+    }
+    return false;
+  });
+
+  const district2 = officers.filter(o => {
+    if (!isCommandRank(o.rank) && o.zone === '2 Zone' && !processedOfficers.has(o.id)) {
+      processedOfficers.add(o.id);
+      return true;
+    }
+    return false;
+  });
+
+  const district3 = officers.filter(o => {
+    if (!isCommandRank(o.rank) && o.zone === '3 Zone' && !processedOfficers.has(o.id)) {
+      processedOfficers.add(o.id);
+      return true;
+    }
+    return false;
+  });
+
+  const district4 = officers.filter(o => {
+    if (!isCommandRank(o.rank) && o.zone === '4 Zone' && !processedOfficers.has(o.id)) {
+      processedOfficers.add(o.id);
+      return true;
+    }
+    return false;
+  });
+
+  // Special units will only show officers not already shown in other groups
+  const specialUnits = officers.filter(o => 
+    o.specialAssignment && o.specialAssignment.length > 0 && !processedOfficers.has(o.id)
+  );
 
   return (
     <div className="space-y-8">

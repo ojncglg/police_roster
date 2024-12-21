@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import type { Officer } from '../../types/officer';
-import { RANKS, ZONES, SECTORS, SPECIAL_ASSIGNMENTS } from '../../types/officer';
+import { RANKS, ZONES, SECTORS, SPECIAL_ASSIGNMENTS, isCommandRank } from '../../types/officer';
 import type { OfficerFormData } from '../../types/officer';
 import { useForm } from '../../hooks/useForm';
 import { officerService } from '../../services/officerService';
@@ -11,8 +11,8 @@ import { Select } from '../common/Input';
 import Card from '../common/Card';
 
 interface OfficerFormProps {
-  officer?: Officer;
-  onSubmit: (officer: Officer) => void;
+  initialData?: OfficerFormData;
+  onSubmit: (data: OfficerFormData) => void;
   onCancel: () => void;
 }
 
@@ -28,6 +28,7 @@ const defaultFormData: OfficerFormData = {
   rank: '',
   zone: '',
   sector: '',
+  isOnDesk: false,
   specialAssignment: '',
   email: '',
   phone: '',
@@ -37,24 +38,8 @@ const defaultFormData: OfficerFormData = {
   isActive: true
 };
 
-const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
-  const initialValues: OfficerFormData = officer
-    ? {
-        firstName: officer.firstName,
-        lastName: officer.lastName,
-        badgeNumber: officer.badgeNumber,
-        rank: officer.rank,
-        zone: officer.zone,
-        sector: officer.sector,
-        specialAssignment: officer.specialAssignment ?? '',
-        email: officer.email ?? '',
-        phone: officer.phone ?? '',
-        status: officer.status,
-        notes: officer.notes ?? '',
-        specialAssignments: officer.specialAssignments,
-        isActive: officer.isActive
-      }
-    : defaultFormData;
+const OfficerForm = ({ initialData, onSubmit, onCancel }: OfficerFormProps) => {
+  const initialValues = initialData || defaultFormData;
 
   const { values, errors, handleChange, handleSubmit, setValue } = useForm<OfficerFormData>({
     initialValues,
@@ -77,23 +62,8 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
         message
       }));
     },
-    onSubmit: async (data) => {
-      try {
-        const result = officer 
-          ? await officerService.updateOfficer(officer.id, data)
-          : await officerService.createOfficer(data);
-        
-        notificationService.success(
-          officer 
-            ? 'Officer updated successfully' 
-            : 'Officer created successfully'
-        );
-        onSubmit(result);
-      } catch (error) {
-        if (error instanceof Error) {
-          notificationService.error(error.message);
-        }
-      }
+    onSubmit: (data) => {
+      onSubmit(data);
     }
   });
 
@@ -111,6 +81,17 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
       setValue('sector', '');
     }
   }, [values.zone, values.sector, availableSectors, setValue]);
+
+  // Handle sector and desk fields when rank changes
+  useEffect(() => {
+    if (isCommandRank(values.rank)) {
+      // Clear sector for command ranks
+      setValue('sector', '');
+    } else {
+      // Clear isOnDesk for non-command ranks
+      setValue('isOnDesk', false);
+    }
+  }, [values.rank, setValue]);
 
   return (
     <Card className="max-w-2xl mx-auto">
@@ -177,7 +158,7 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
             error={errors.phone}
           />
 
-          {/* Zone */}
+          {/* Zone and Sector */}
           <Select
             label="Zone"
             name="zone"
@@ -187,8 +168,6 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
             options={ZONES.map(zone => ({ value: zone.id, label: zone.name }))}
             required
           />
-
-          {/* Sector */}
           <Select
             label="Sector"
             name="sector"
@@ -202,6 +181,21 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
             disabled={!values.zone}
             required
           />
+
+          {/* Desk Duty Checkbox for Sergeants and above */}
+          {isCommandRank(values.rank) && (
+            <div className="md:col-span-2">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={values.isOnDesk}
+                  onChange={(e) => setValue('isOnDesk', e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">Assigned to Desk Duty</span>
+              </label>
+            </div>
+          )}
 
           {/* Special Assignments */}
           <div className="md:col-span-2">
@@ -236,9 +230,11 @@ const OfficerForm = ({ officer, onSubmit, onCancel }: OfficerFormProps) => {
             onChange={handleChange}
             options={[
               { value: 'active', label: 'Active' },
-              { value: 'inactive', label: 'Inactive' },
-              { value: 'leave', label: 'On Leave' },
-              { value: 'training', label: 'Training' },
+              { value: 'deployed', label: 'Deployed' },
+              { value: 'fmla', label: 'FMLA' },
+              { value: 'tdy', label: 'TDY' },
+              { value: 'retired', label: 'Retired' },
+              { value: 'adminLeave', label: 'Admin Leave' },
             ]}
             required
           />
