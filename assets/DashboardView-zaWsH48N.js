@@ -1,0 +1,1 @@
+import{u as e,r}from"./index-Bl4yh2LS.js";const o=()=>{const t=e();return r.useEffect(()=>{const a=new Date().toISOString().split("T")[0];t(`/dashboard/daily-roster?date=${a}`,{replace:!0})},[t]),null};export{o as default};
