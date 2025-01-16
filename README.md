@@ -1,73 +1,76 @@
-# Assignment 1
+Police Roster Management System Overview A comprehensive web-based roster management system designed for police departments. The system handles complex 4-4 shift rotations with a 32-day cycle, manages vacation requests, and provides supervisor oversight capabilities. Features
 
-## Objective
+Complex 32-day shift rotation management Supervisor and employee role-based access Vacation request and approval system Interactive calendar view Real-time roster updates Zone and sector assignment tracking
 
-For Assignment 1 (A1) we are going to be building four different timer components that we will use in future assignments.
+Tech Stack
 
-## What are we building?
+Frontend: React.js with TypeScript Backend: Node.js with Express Database: PostgreSQL Authentication: JWT
 
-In the fitness world, there are lots of different ways a workout can be timed. For example, we can use a traditional stopwatch, a count-down timer, an interval timer, etc. To support our athletes, we’ll be building 4 different types of timers:
+Project Roadmap Phase 1: Project Setup and Basic Infrastructure
 
-| Timer type | Description                                                                                                                                                                                                                                                                               |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Stopwatch  | A timer that counts up to X amount of time (e.g. count up to 2 minutes and 30 seconds, starting at 0)                                                                                                                                                                                     |
-| Countdown  | A timer that counts down from X amount of time (e.g. count down to 0, starting at 2 minutes and 30)                                                                                                                                                                                       |
-| XY         | A timer that counts down from X time per round, for Y number of rounds (e.g. 1 minute for 10 minutes would count down from 1 minute to 0, then start another countdown, etc, 10 times )                                                                                                   |
-| TABATA     | An interval timer with work/rest periods. Example: 20s/10s, 8 rounds, would count down from 20 seconds to 0, then count down from 10 seconds to 0, then from 20, then from 10, etc, for 8 rounds. A full round includes both the work and rest. In this case, 20+10=30 seconds per round. |
+Create project repository Set up basic React frontend with TypeScript Initialize Node.js backend Set up PostgreSQL database Configure development environment Implement basic project structure
 
-Our larger components are going to be `Stopwatch`, `Countdown`, `XY`, and `Tabata` (all of them are located in `src/components/timers`), but you can imagine that they have common functionality. An example is a start button. All timers are going to have to have a way to start. Our goal is to take these large components and extract common functionality into smaller components. We might have a `Button` component that is shared by all of our timers and it might have a prop that we pass in that changes the background color in order to create a start `Button` and a stop `Button`.
+Phase 2: Authentication and User Management
 
-## Deliverable
+Design and implement user schemas Create authentication system Implement role-based access control Create login/logout functionality Set up user profile management Add password reset functionality
 
-1. Get all 4 types of timers to work. The timers should have a pause/resume button, a reset button, and a "fast forward" button (ends the timer). All timers should render at `localhost:5173`.
-2. You should try to DRY up your code by creating generic components that are going to be used by your timers. The most basic ones, but not limited to, are going to be a `Button`, `Input`, `DisplayTime`, `DisplayRounds`, and `Panel` (that handles layout of your timer).
-3. For now you are going to want to store all state in the timers themselves.
-4. Style your components in a way that they are consistent and look presentable. Do not use an existing UI design library (e.g. MUI or Antd), instead try to come up with your own. **You are welcome to search the internet for design inspiration, but make sure to cite all resources you have used.**
-5. Deploy your application to Github pages.
+Phase 3: Shift Rotation Core Logic
 
-## Grading rubric
+Implement shift calculation algorithms Create shift rotation database schema Build shift assignment system Add shift validation logic Create shift display components Implement shift modification capabilities
 
-- All 4 timers are working correctly. Timers should have pause/resume button, a reset button, and a button that ends the timer (puts the timer in completed state).
-- UI is consistent and effort has been put into making it look nice. Cite any resources you used.
-- Keep your code as DRY (Don't repeat yourself) as possible
-- The console should be free of JS erros, TS errors, and warnings
+Phase 4: Roster Management
 
-## Bonus (5pt)
+Create roster database schema Build roster display interface Implement roster editing capabilities Add sector/zone assignment features Create roster search and filter functionality Implement roster export features
 
-- Document all of your generic components. A template for this documentation can be found at `/docs`.
+Phase 5: Calendar Integration
 
-## Install and Run Project
+Design calendar interface Implement date selection functionality Create daily roster view Add shift highlighting Integrate vacation display Add calendar navigation features
 
-Install project
+Phase 6: Vacation Management
 
-```
-npm i
-```
+Create vacation request schema Build request submission interface Implement approval workflow Add validation rules Create notification system Integrate with roster system
 
-Run project
+Phase 7: Supervisor Features
 
-```
-npm run dev
-```
+Create supervisor dashboard Implement roster overview Add staff management features Create reporting tools Implement batch operations Add oversight capabilities
 
-Timers: `localhost:5173`. Documentation: `localhost:5173/docs`
+Phase 8: Testing and Optimization
 
-## Deploy to GH-Pages
+Write unit tests Perform integration testing Conduct user acceptance testing Optimize performance Security audit Load testing
 
-**It is important that you follow these steps in the correct order:**
+Phase 9: Documentation and Deployment
 
-1. Open `package.json` and update the `"homepage"` key with your repo information. It should change from:
+Write technical documentation Create user guides Set up deployment pipeline Configure production environment Deploy beta version Monitor system performance
 
-`"homepage": "https://hes-e39.github.io/assignment-1/"`
+Installation bashCopy# Clone the repository git clone https://github.com/yourusername/police-roster-system.git
 
-to
+Install frontend dependencies
+cd client npm install
 
-`"homepage": "https://hes-e39.github.io/<your repo>/"`
+Install backend dependencies
+cd ../server npm install
 
-If you created this repo in github classrooms, the repo name should have your username at the end of it. Make sure to copy the whole thing. Also make sure the trailing `/` follows after your repo name.
+Set up environment variables
+cp .env.example .env
 
-2. Push changes to GH
-3. Wait until actions finish, this will create a new branch `gh-pages` and run the deployment
-4. In your GH repo: Settings -> Pages -> Build and deployment -> Branch -> gh-pages
+Start development servers
+Frontend
+cd client npm start
 
-You might have to hard refresh the browser page when pushing multiple updates to GH in order to reflect the most recent changes.
+Backend
+cd ../server npm run dev Environment Variables Create a .env file in the server directory with the following variables: CopyDATABASE_URL=postgresql://username:password@localhost:5432/roster_db JWT_SECRET=your_jwt_secret PORT=3000 NODE_ENV=development Database Setup bashCopy# Create database createdb roster_db
+
+Run migrations
+npm run migrate
+
+Seed initial data
+npm run seed Testing bashCopy# Run frontend tests cd client npm test
+
+Run backend tests
+cd server npm test Contributing
+
+Fork the repository Create your feature branch (git checkout -b feature/AmazingFeature) Commit your changes (git commit -m 'Add some AmazingFeature') Push to the branch (git push origin feature/AmazingFeature) Open a Pull Request
+
+License This project is licensed under the MIT License - see the LICENSE.md file for details. Contact Your Name - your.email@example.com Project Link: https://github.com/yourusername/police-roster-system Acknowledgments
+
+Thanks to all contributors Police department stakeholders Open source community
